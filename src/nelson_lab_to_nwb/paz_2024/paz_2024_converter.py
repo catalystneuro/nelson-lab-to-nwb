@@ -3,7 +3,7 @@ from nelson_lab_to_nwb.paz_2024.paz_2024_behavior_interface import Paz2024Behavi
 from neuroconv import NWBConverter
 
 
-class Azcorra2023NWBConverter(NWBConverter):
+class Paz2024NWBConverter(NWBConverter):
     """Primary conversion class for Paz experimental data."""
 
     data_interface_classes = dict(
