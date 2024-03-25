@@ -1,4 +1,5 @@
 from nelson_lab_to_nwb.interfaces.tdt_interface import TdtFiberPhotometryInterface
+from nelson_lab_to_nwb.paz_2024.paz_2024_behavior_interface import Paz2024BehaviorInterface
 from neuroconv import NWBConverter
 
 
@@ -7,5 +8,5 @@ class Azcorra2023NWBConverter(NWBConverter):
 
     data_interface_classes = dict(
         TdtFiberPhotometryInterface=TdtFiberPhotometryInterface,
-        # Events=PicoscopeEventInterface,
+        BehaviorInterface=Paz2024BehaviorInterface,
     )
