@@ -1,0 +1,59 @@
+NWBFile:
+  session_description: Day 1 of levodopa.
+  institution: University of California San Francisco
+  lab: Nelson Lab
+  experimenter:
+    - Paz, Rodrigo
+    - Last, First Middle
+  pharmacology: "Levodopa concentration: 5mg/kg."
+Subject:
+  subject_id: rp230717g
+  genotype: A2A-Cre
+  description: 6-OHDA left MFB; Flex-GCaMP6s DLS; 400um Fiber
+  species: Mus musculus
+  date_of_birth: 2023-03-17T00:00:00
+  sex: F
+Ophys:
+  FiberPhotometry:
+    Fibers:
+      - location: Location of this fiber
+        coordinates: [0.0, 0.0, 0.0] # Fiber placement taxonomical coordinates in (AP, ML, Z) in mm relative to Bregma
+        notes: extra notes
+        fiber_model_number: The model number of the fiber
+        dichroic_model_number: The model number of the dichroic mirror
+    ExcitationSources:
+      - source_type: laser # LED or laser
+        peak_wavelength: 465.0
+    Photodetectors:
+      - peak_wavelength: 500.0
+        type: PMT # PMT or photodiode
+        gain: 100.0
+        model_number: The model number of the photodetector
+    Fluorophores:
+      - label: dlight
+        location: VTA
+        emission_lambda: 500.0
+        excitation_lambda: 465.0
+        coordinates: [0.0, 0.0, 0.0] # Fluorophore injection site in taxonomical coordinates in (AP, ML, Z) in mm relative to Bregma
+    FiberPhotometryResponseSeries:
+      - name: _405A
+        description: isosbestic signal
+        unit: F
+        fibers: [0]
+        excitation_sources: [0]
+        photodetectors: [0]
+        fluorophores: [0]
+      - name: _465A
+        description: neuronal signal
+        unit: F
+        fibers: [0]
+        excitation_sources: [0]
+        photodetectors: [0]
+        fluorophores: [0]
+      - name: Fi1r
+        description: raw light
+        unit: F
+        fibers: [0]
+        excitation_sources: [0]
+        photodetectors: [0]
+        fluorophores: [0]
