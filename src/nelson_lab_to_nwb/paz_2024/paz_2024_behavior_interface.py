@@ -1,4 +1,5 @@
 from typing import Optional
+from pynwb import NWBFile
 from neuroconv import BaseDataInterface
 from neuroconv.utils import FilePathType
 import pandas as pd
@@ -66,3 +67,10 @@ class Paz2024BehaviorInterface(BaseDataInterface):
             self.processed_df = pd.read_excel(io=processed_behavior_path, engine='openpyxl')
         else:
             self.processed_df = None
+
+    def add_to_nwbfile(
+        self,
+        nwbfile: NWBFile,
+        metadata: Optional[dict] = dict(),
+    ) -> None:
+        pass
