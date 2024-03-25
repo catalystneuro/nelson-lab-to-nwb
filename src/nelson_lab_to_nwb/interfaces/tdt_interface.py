@@ -6,7 +6,6 @@ import yaml
 from neuroconv import BaseDataInterface
 from neuroconv.utils import FolderPathType, FilePathType, dict_deep_update
 from pynwb import NWBFile
-from pynwb.core import DynamicTableRegion
 from ndx_photometry import (
     FibersTable,
     PhotodetectorsTable,
