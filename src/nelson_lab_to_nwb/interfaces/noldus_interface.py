@@ -1,8 +1,9 @@
 from typing import Optional
 from pynwb import NWBFile
 from neuroconv import BaseDataInterface
-from neuroconv.utils import FilePathType
+from neuroconv.utils import FilePathType, FolderPathType
 import pandas as pd
+import tdt
 
 
 def find_header_row(file_path, header_names: list = ["Trial time", "Recording time"]):
@@ -18,30 +19,31 @@ def find_header_row(file_path, header_names: list = ["Trial time", "Recording ti
     return None
 
 
-class Paz2024BehaviorInterface(BaseDataInterface):
+class NoldusInterface(BaseDataInterface):
     """
-    Custom data interface class for converting Paz behavior data.
+    Custom data interface class for converting Noldus behavior data.
     """
 
-    display_name = "Paz Behavior Interface"
+    display_name = "Noldus Behavior Interface"
     associated_suffixes = ("csv", "xlsx")
-    info = "Interface for behavioral data."
+    info = "Interface for Noldus behavioral data."
 
     def __init__(
         self,
         raw_behavior_path: Optional[FilePathType] = None,
-        processed_behavior_path: Optional[FilePathType] = None,
+        tdt_block_path: Optional[FolderPathType] = None,
         verbose: bool = False
     ):
         """
         Args:
             raw_behavior_path (FilePathType, optional): Path to the raw behavior data file. Defaults to None.
-            processed_behavior_path (FilePathType, optional): Path to the processed behavior data file. Defaults to None.
+            tdt_block_path (FolderPathType, optional): Path to the TDT block file. Defaults to None.
             verbose (bool, optional): Whether to print verbose output. Defaults to False.
         """
         super().__init__(
             raw_behavior_path=raw_behavior_path,
             processed_behavior_path=processed_behavior_path,
+            tdt_block_path=tdt_block_path,
             verbose=verbose
         )
 
@@ -61,16 +63,25 @@ class Paz2024BehaviorInterface(BaseDataInterface):
         else:
             self.raw_df = None
 
-        # Processed behavior
-        self.processed_behavior_path = processed_behavior_path
-        if processed_behavior_path:
-            self.processed_df = pd.read_excel(io=processed_behavior_path, engine='openpyxl')
-        else:
-            self.processed_df = None
+        # # Processed behavior
+        # self.processed_behavior_path = processed_behavior_path
+        # if processed_behavior_path:
+        #     self.processed_df = pd.read_excel(io=processed_behavior_path, engine='openpyxl')
+        # else:
+        #     self.processed_df = None
+
+        # TDT block reader
+        if tdt_block_path:
+            self.reader = tdt.read_block(block_path=str(tdt_block_path))
+
 
     def add_to_nwbfile(
         self,
         nwbfile: NWBFile,
         metadata: Optional[dict] = dict(),
+        timestamps_column_name: str = "Trial time",
+        ttl_sync_epoc_name: str = "Cam2",
     ) -> None:
-        pass
+
+        ttl_sync_array = self.reader.epocs[ttl_sync_epoc_name].onset
+
