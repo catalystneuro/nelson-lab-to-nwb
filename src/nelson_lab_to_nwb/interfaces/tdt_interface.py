@@ -91,8 +91,8 @@ class TdtFiberPhotometryInterface(BaseDataInterface):
                 label=f.get("label", "label not defined"),
                 location=f.get("location", "location not defined"),
                 coordinates=f.get("coordinates", None),
-                emission_lambda=f.get("emission_lambda"),
-                excitation_lambda=f.get("excitation_lambda"),
+                emission_peak_wavelength=f.get("emission_peak_wavelength"),
+                excitation_peak_wavelength=f.get("excitation_peak_wavelength"),
             )
 
         # Add the metadata tables to the metadata section

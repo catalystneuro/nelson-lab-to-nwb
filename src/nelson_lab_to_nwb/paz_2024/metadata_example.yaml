@@ -36,8 +36,8 @@ Ophys:
     Fluorophores:
       - label: dlight
         location: VTA
-        emission_lambda: 500.0
-        excitation_lambda: 465.0
+        emission_peak_wavelength: 500.0
+        excitation_peak_wavelength: 465.0
         coordinates: [0.0, 0.0, 0.0] # Fluorophore injection site in taxonomical coordinates in (AP, ML, Z) in mm relative to Bregma
     FiberPhotometryResponseSeries:
       - name: _405A
