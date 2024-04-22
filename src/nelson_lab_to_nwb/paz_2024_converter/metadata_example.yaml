@@ -6,6 +6,10 @@ NWBFile:
     - Paz, Rodrigo
     - Last, First Middle
   pharmacology: "Levodopa concentration: 5mg/kg."
+  surgery: |
+    "injection of 1ul of 5ug/ul of 6-OHDA HBr into left MFB (-1AP; -1.1 ML; -4.8DV from bregma)
+    and 500ul of 1:9 Flex-GCaMP6s into left DLS (+0.8AP; -2.4ML; -3DV from bregma)"
+  virus: "AAV1.Syn.Flex.GCaMP6s.WPRE.SV40"
 Subject:
   subject_id: rp230717g
   genotype: A2A-Cre
@@ -32,8 +36,8 @@ Ophys:
     Fluorophores:
       - label: dlight
         location: VTA
-        emission_lambda: 500.0
-        excitation_lambda: 465.0
+        emission_peak_wavelength: 500.0
+        excitation_peak_wavelength: 465.0
         coordinates: [0.0, 0.0, 0.0] # Fluorophore injection site in taxonomical coordinates in (AP, ML, Z) in mm relative to Bregma
     FiberPhotometryResponseSeries:
       - name: _405A

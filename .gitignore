@@ -162,6 +162,3 @@ cython_debug/
 
 # Conversion specific files to ignore
 *.nwb
-
-# just for now
-examples/*

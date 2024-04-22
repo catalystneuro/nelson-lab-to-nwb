@@ -1,0 +1,13 @@
+NWBFile:
+  session_description: Blackrock recording session
+  institution: University of California San Francisco
+  lab: Nelson Lab
+  experimenter:
+    - Last, First Middle
+Subject:
+  subject_id: subid012345
+  genotype: not defined
+  description: not defined
+  species: Mus musculus
+  date_of_birth: 2023-03-17T00:00:00
+  sex: F

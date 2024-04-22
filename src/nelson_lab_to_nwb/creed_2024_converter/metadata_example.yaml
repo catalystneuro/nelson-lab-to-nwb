@@ -1,0 +1,15 @@
+NWBFile:
+  session_start_time: 2000-07-23T00:00:00-07:00
+  session_description: Description of this session
+  institution: University of California San Francisco
+  lab: Nelson Lab
+  experimenter:
+    - Creed, Rose
+    - Last, First Middle
+Subject:
+  subject_id: subid012345
+  genotype: not defined
+  description: not defined
+  species: Mus musculus
+  date_of_birth: 2023-03-17T00:00:00
+  sex: F
