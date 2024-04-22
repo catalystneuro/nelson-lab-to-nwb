@@ -1,12 +1,12 @@
 from typing import Optional, Union
-from pynwb import NWBFile
+from pynwb import NWBFile, TimeSeries
 from neuroconv import BaseDataInterface
 from neuroconv.utils import FilePathType
 import pandas as pd
 import numpy as np
 
 
-def find_header_row(file_path, header_names: list = ["Trial time", "Recording time"]) -> Optional[int]:
+def find_header_row(file_path, header_names: list) -> Optional[int]:
     with pd.ExcelFile(file_path, engine='openpyxl') as xls:
         # Loop through each row in the first sheet
         for sheet_name in xls.sheet_names:
@@ -19,20 +19,21 @@ def find_header_row(file_path, header_names: list = ["Trial time", "Recording ti
     return None
 
 
-class NoldusInterface(BaseDataInterface):
+class AIMScoreInterface(BaseDataInterface):
     """
-    Custom data interface class for converting Noldus behavior data.
+    Custom data interface class for converting AIM score behavior data.
     """
 
-    display_name = "Noldus Behavior Interface"
+    display_name = "AIM Score Behavior Interface"
     associated_suffixes = ("csv", "xlsx")
-    info = "Interface for Noldus behavioral data."
+    info = "Interface for AIM Score behavioral data."
 
     def __init__(
         self,
         file_path: FilePathType,
         reference_timestamps: Union[list[float], np.ndarray, None] = None,
-        variables_names: list[str] = ["Elongation", "Velocity", "Distance moved", "Rotation"],
+        timestamp_column_name: str = "Time (minutes relative to injection)",
+        aims_column_name: str = "AIMS",
         verbose: bool = False
     ):
         """
@@ -46,9 +47,8 @@ class NoldusInterface(BaseDataInterface):
             verbose=verbose
         )
 
-        # Raw behavior
         self.file_path = file_path
-        header_row = find_header_row(file_path, header_names=["Trial time", "Recording time"])
+        header_row = find_header_row(file_path, header_names=[timestamp_column_name, aims_column_name])
         if header_row is not None:
             df = pd.read_excel(
                 io=str(file_path),
@@ -56,33 +56,25 @@ class NoldusInterface(BaseDataInterface):
                 engine='openpyxl'
             )
             df = df.drop(index=0)
-            self.df = df[[*variables_names, "Trial time"]]
+            self.df = df[[timestamp_column_name, aims_column_name]]
         else:
-            raise ValueError("Could not find the header row in the raw behavior file.")
-
-        timestamp_samples = self.df["Trial time"].astype(float) / 0.05
-        self.df["timestamp_samples"] = timestamp_samples
-
-        if reference_timestamps is not None:
-            self.df["synced_timestamps"] = [
-                reference_timestamps[int(t)]
-                if int(t) < len(reference_timestamps)
-                else None
-                for t in timestamp_samples
-            ]
-
-        # # Processed behavior
-        # self.processed_behavior_path = processed_behavior_path
-        # if processed_behavior_path:
-        #     self.processed_df = pd.read_excel(io=processed_behavior_path, engine='openpyxl')
-        # else:
-        #     self.processed_df = None
+            raise ValueError("Could not find the header row in the AIM score behavior file.")
 
     def add_to_nwbfile(
         self,
         nwbfile: NWBFile,
         metadata: Optional[dict] = dict(),
-        timestamps_column_name: str = "Trial time",
-        ttl_sync_epoc_name: str = "Cam2",
+        timestamps_column_name: str = "Time (minutes relative to injection)",
+        aims_column_name: str = "AIMS",
     ) -> None:
-        pass
+        behavior_module = nwbfile.create_processing_module(
+            name="behavior", description="Processed behavioral data"
+        )
+
+        data = self.df[aims_column_name].values
+        timestamps = self.df[timestamps_column_name].values * 60
+        aims_ts = TimeSeries(
+            name="aims", data=data, unit="na", timestamps=timestamps
+        )
+
+        behavior_module.add(aims_ts)

@@ -1,5 +1,6 @@
-neuroconv==0.4.6
+neuroconv>=0.4.9
 spikeinterface>=0.100.2
+dandi>=0.61.2
 nwbwidgets==0.11.3
 nwbinspector==0.4.33
 ndx-events==0.2.0
