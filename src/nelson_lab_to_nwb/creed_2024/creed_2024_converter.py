@@ -1,5 +1,8 @@
-from nelson_lab_to_nwb.interfaces.nex_interface import NeuroExplorerRecordingInterface
-from nelson_lab_to_nwb.interfaces.noldus_interface import NoldusInterface
+from nelson_lab_to_nwb.interfaces import (
+    NeuroExplorerRecordingInterface,
+    NoldusInterface,
+    AIMScoreInterface
+)
 from neuroconv import NWBConverter
 
 
@@ -9,4 +12,5 @@ class Creed2024NWBConverter(NWBConverter):
     data_interface_classes = dict(
         NeuroExplorerRecordingInterface=NeuroExplorerRecordingInterface,
         NoldusInterface=NoldusInterface,
+        AIMScore=AIMScoreInterface
     )

@@ -31,22 +31,17 @@ class NoldusInterface(BaseDataInterface):
     def __init__(
         self,
         file_path: FilePathType,
-        reference_timestamps: Union[list[float], np.ndarray, None] = None,
-        variables_names: list[str] = ["Elongation", "Velocity", "Distance moved", "Rotation"],
         verbose: bool = False
     ):
         """
         Args:
             file_path (FilePathType): Path to the behavior data file.
-            reference_timestamps (Union[list[float], np.ndarray], optional): Reference timestamps for synchronization. Defaults to None.
             verbose (bool, optional): Whether to print verbose output. Defaults to False.
         """
         super().__init__(
             file_path=file_path,
             verbose=verbose
         )
-
-        # Raw behavior
         self.file_path = file_path
         header_row = find_header_row(file_path, header_names=["Trial time", "Recording time"])
         if header_row is not None:
@@ -55,12 +50,21 @@ class NoldusInterface(BaseDataInterface):
                 header=header_row,
                 engine='openpyxl'
             )
-            df = df.drop(index=0)
-            self.df = df[[*variables_names, "Trial time"]]
+            self.df = df.drop(index=0)
         else:
             raise ValueError("Could not find the header row in the raw behavior file.")
 
-        timestamp_samples = self.df["Trial time"].astype(float) / 0.05
+    def add_to_nwbfile(
+        self,
+        nwbfile: NWBFile,
+        metadata: Optional[dict] = dict(),
+        variables_columns_names: list[str] = ["Elongation", "Velocity", "Distance moved", "Rotation"],
+        timestamps_column_name: str = "Trial time",
+        reference_timestamps: Union[list[float], np.ndarray, None] = None,
+    ) -> None:
+
+        self.df = self.df[variables_columns_names + [timestamps_column_name]]
+        timestamp_samples = self.df[timestamps_column_name].astype(float) / 0.05
         self.df["timestamp_samples"] = timestamp_samples
 
         if reference_timestamps is not None:
@@ -70,19 +74,3 @@ class NoldusInterface(BaseDataInterface):
                 else None
                 for t in timestamp_samples
             ]
-
-        # # Processed behavior
-        # self.processed_behavior_path = processed_behavior_path
-        # if processed_behavior_path:
-        #     self.processed_df = pd.read_excel(io=processed_behavior_path, engine='openpyxl')
-        # else:
-        #     self.processed_df = None
-
-    def add_to_nwbfile(
-        self,
-        nwbfile: NWBFile,
-        metadata: Optional[dict] = dict(),
-        timestamps_column_name: str = "Trial time",
-        ttl_sync_epoc_name: str = "Cam2",
-    ) -> None:
-        pass

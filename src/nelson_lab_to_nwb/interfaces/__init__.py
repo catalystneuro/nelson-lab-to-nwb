@@ -1,4 +1,5 @@
 from .tdt_interface import TdtFiberPhotometryInterface
-from .noldus_interface import NoldusInterface
 from .intan_multi_interface import IntanMultifilesRecordingInterface
+from .nex_interface import NeuroExplorerRecordingInterface
+from .noldus_interface import NoldusInterface
 from .aim_score_interface import AIMScoreInterface

@@ -1,7 +1,6 @@
 from typing import Optional, Literal
-import yaml
 from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
-from neuroconv.utils import FilePathType, dict_deep_update
+from neuroconv.utils import FilePathType
 from pynwb import NWBFile
 
 
@@ -19,7 +18,6 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
     def __init__(
         self,
         file_path: FilePathType,
-        metadata_path: Optional[FilePathType] = None,
         es_key: str = "ElectricalSeries",
         verbose: bool = True,
     ):
@@ -34,16 +32,6 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         self.verbose = verbose
         self.es_key = es_key
         self._number_of_segments = self.recording_extractor.get_num_segments()
-        if metadata_path:
-            with open(str(metadata_path), "r") as f:
-                self.extra_metadata = yaml.safe_load(f)
-        else:
-            self.extra_metadata = {}
-
-    def get_metadata(self) -> dict:
-        metadata = super().get_metadata()
-        metadata = dict_deep_update(metadata, self.extra_metadata)
-        return metadata
 
     def add_to_nwbfile(
         self,

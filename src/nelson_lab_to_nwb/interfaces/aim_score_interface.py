@@ -31,9 +31,6 @@ class AIMScoreInterface(BaseDataInterface):
     def __init__(
         self,
         file_path: FilePathType,
-        reference_timestamps: Union[list[float], np.ndarray, None] = None,
-        timestamp_column_name: str = "Time (minutes relative to injection)",
-        aims_column_name: str = "AIMS",
         verbose: bool = False
     ):
         """
@@ -46,19 +43,7 @@ class AIMScoreInterface(BaseDataInterface):
             file_path=file_path,
             verbose=verbose
         )
-
         self.file_path = file_path
-        header_row = find_header_row(file_path, header_names=[timestamp_column_name, aims_column_name])
-        if header_row is not None:
-            df = pd.read_excel(
-                io=str(file_path),
-                header=header_row,
-                engine='openpyxl'
-            )
-            df = df.drop(index=0)
-            self.df = df[[timestamp_column_name, aims_column_name]]
-        else:
-            raise ValueError("Could not find the header row in the AIM score behavior file.")
 
     def add_to_nwbfile(
         self,
@@ -66,15 +51,34 @@ class AIMScoreInterface(BaseDataInterface):
         metadata: Optional[dict] = dict(),
         timestamps_column_name: str = "Time (minutes relative to injection)",
         aims_column_name: str = "AIMS",
+        reference_timestamps: Union[list[float], np.ndarray, None] = None,
     ) -> None:
+        # Read file into DataFrame
+        header_row = find_header_row(
+            file_path=self.file_path,
+            header_names=[timestamps_column_name, aims_column_name]
+        )
+        if header_row is not None:
+            df = pd.read_excel(
+                io=str(self.file_path),
+                header=header_row,
+                engine='openpyxl'
+            )
+            df = df.drop(index=0)
+            df = df[[timestamps_column_name, aims_column_name]]
+        else:
+            raise ValueError("Could not find the header row in the AIM score behavior file.")
+
+        # Create processing module and add TimeSeries
         behavior_module = nwbfile.create_processing_module(
             name="behavior", description="Processed behavioral data"
         )
-
-        data = self.df[aims_column_name].values
-        timestamps = self.df[timestamps_column_name].values * 60
+        data = df[aims_column_name].values
+        timestamps = df[timestamps_column_name].values * 60
         aims_ts = TimeSeries(
-            name="aims", data=data, unit="na", timestamps=timestamps
+            name="aims",
+            data=data,
+            unit="na",
+            timestamps=timestamps
         )
-
         behavior_module.add(aims_ts)
