@@ -26,8 +26,14 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
 
         self.Extractor = NeuroExplorerRecordingExtractor
         streams_names = NeuroExplorerRecordingExtractor.get_streams(file_path=file_path)[0]
+
+        # Because this recorder only extracts one channel at a time, we need to aggregate the channels
         recording_list = [NeuroExplorerRecordingExtractor(file_path=file_path, stream_name=stream_name) for stream_name in streams_names]
         self.recording_extractor = aggregate_channels(recording_list)
+
+        self.neo_rec0 = recording_list[0].neo_reader
+        self.recording_header = self.neo_rec0.header
+
         self.subset_channels = None
         self.verbose = verbose
         self.es_key = es_key
@@ -45,6 +51,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         compression_opts: Optional[int] = None,
         iterator_type: str = "v2",
         iterator_opts: Optional[dict] = None,
+        include_units: bool = True,
     ) -> None:
         super().add_to_nwbfile(
             nwbfile=nwbfile,
@@ -58,3 +65,6 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             iterator_type=iterator_type,
             iterator_opts=iterator_opts,
         )
+
+        # Todo - add spike data
+        self.recording_header['spike_channels']

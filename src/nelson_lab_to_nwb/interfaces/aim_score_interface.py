@@ -70,9 +70,12 @@ class AIMScoreInterface(BaseDataInterface):
             raise ValueError("Could not find the header row in the AIM score behavior file.")
 
         # Create processing module and add TimeSeries
-        behavior_module = nwbfile.create_processing_module(
-            name="behavior", description="Processed behavioral data"
-        )
+        if "behavior" not in nwbfile.processing:
+            behavior_module = nwbfile.create_processing_module(
+                name="behavior", description="Processed behavioral data"
+            )
+        else:
+            behavior_module = nwbfile.processing["behavior"]
         data = df[aims_column_name].values
         timestamps = df[timestamps_column_name].values * 60
         aims_ts = TimeSeries(

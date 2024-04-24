@@ -1,5 +1,5 @@
-from typing import Optional, Union
-from pynwb import NWBFile
+from typing import Optional
+from pynwb import NWBFile, TimeSeries
 from neuroconv import BaseDataInterface
 from neuroconv.utils import FilePathType
 import pandas as pd
@@ -58,9 +58,10 @@ class NoldusInterface(BaseDataInterface):
         self,
         nwbfile: NWBFile,
         metadata: Optional[dict] = dict(),
-        variables_columns_names: list[str] = ["Elongation", "Velocity", "Distance moved", "Rotation"],
+        variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
         timestamps_column_name: str = "Trial time",
-        reference_timestamps: Union[list[float], np.ndarray, None] = None,
+        reference_timestamps: list = None,
+        timestamp_offset: float = 0.0
     ) -> None:
 
         self.df = self.df[variables_columns_names + [timestamps_column_name]]
@@ -74,3 +75,23 @@ class NoldusInterface(BaseDataInterface):
                 else None
                 for t in timestamp_samples
             ]
+        else:
+            self.df["synced_timestamps"] = self.df[timestamps_column_name].astype(float) + timestamp_offset
+
+        # Create processing module and add TimeSeries
+        if "behavior" not in nwbfile.processing:
+            behavior_module = nwbfile.create_processing_module(
+                name="behavior", description="Processed behavioral data"
+            )
+        else:
+            behavior_module = nwbfile.processing["behavior"]
+        timestamps = self.df["synced_timestamps"].values
+        for var_name in variables_columns_names:
+            data = self.df[var_name].values
+            ts = TimeSeries(
+                name=var_name,
+                data=data,
+                unit="na",
+                timestamps=timestamps
+            )
+            behavior_module.add(ts)
