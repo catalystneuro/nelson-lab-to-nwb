@@ -52,6 +52,7 @@ class AIMScoreInterface(BaseDataInterface):
         timestamps_column_name: str = "Time (minutes relative to injection)",
         aims_column_name: str = "AIMS",
         reference_timestamps: Union[list[float], np.ndarray, None] = None,
+        timestamp_offset: float = 0.0
     ) -> None:
         # Read file into DataFrame
         header_row = find_header_row(
@@ -64,7 +65,6 @@ class AIMScoreInterface(BaseDataInterface):
                 header=header_row,
                 engine='openpyxl'
             )
-            df = df.drop(index=0)
             df = df[[timestamps_column_name, aims_column_name]]
         else:
             raise ValueError("Could not find the header row in the AIM score behavior file.")
@@ -77,7 +77,7 @@ class AIMScoreInterface(BaseDataInterface):
         else:
             behavior_module = nwbfile.processing["behavior"]
         data = df[aims_column_name].values
-        timestamps = df[timestamps_column_name].values * 60
+        timestamps = df[timestamps_column_name].values * 60 + timestamp_offset
         aims_ts = TimeSeries(
             name="aims",
             data=data,

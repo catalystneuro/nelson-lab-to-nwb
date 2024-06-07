@@ -3,3 +3,4 @@ from .intan_multi_interface import IntanMultifilesRecordingInterface
 from .nex_interface import NeuroExplorerRecordingInterface
 from .noldus_interface import NoldusInterface
 from .aim_score_interface import AIMScoreInterface
+from .cognitive_behavioral_interface import CognitiveBehavioralInterface

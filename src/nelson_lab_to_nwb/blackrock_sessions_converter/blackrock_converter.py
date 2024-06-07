@@ -1,4 +1,5 @@
 from neuroconv.datainterfaces import BlackrockRecordingInterface, BlackrockSortingInterface
+from nelson_lab_to_nwb.interfaces import CognitiveBehavioralInterface
 from neuroconv import NWBConverter
 
 
@@ -9,4 +10,5 @@ class BlackrockNWBConverter(NWBConverter):
         BlackrockRaw=BlackrockRecordingInterface,
         BlackrockLFP=BlackrockRecordingInterface,
         BlackrockSorting=BlackrockSortingInterface,
+        BehavioralEvents=CognitiveBehavioralInterface
     )

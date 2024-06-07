@@ -12,6 +12,7 @@ def session_to_nwb(
     metadata_file_path: FilePathType,
     output_folder_path: FolderPathType,
     noldus_start_event_name: str = "Noldus Start",
+    aim_start_event_name: str = "Keyboard1",
     stub_test: bool = False,
     overwrite: bool = False,
     verbose: bool = True,
@@ -66,20 +67,29 @@ def session_to_nwb(
     nex_interface = converter.data_interface_objects["NeuroExplorerRecordingInterface"]
     neo_rec = nex_interface.neo_rec0
     noldus_time_offset = None
+    aim_time_offset = None
     for ii, ev in enumerate(nex_interface.recording_header.get("event_channels", [])):
         if ev[0] == noldus_start_event_name:
             noldus_time_offset = neo_rec.rescale_event_timestamp(
                 event_timestamps=neo_rec.get_event_timestamps(event_channel_index=int(ev[1]))[0][0]
             )
-            # noldus_time_offset = ev[1]
-            break
+            print(f"Found event '{noldus_start_event_name}' at time {noldus_time_offset}.")
+        if ev[0] == aim_start_event_name:
+            aim_time_offset = neo_rec.rescale_event_timestamp(
+                event_timestamps=neo_rec.get_event_timestamps(event_channel_index=int(ev[1]))[0][0]
+            )
+            print(f"Found event '{aim_start_event_name}' at time {aim_time_offset}.")
     if noldus_time_offset is None:
         Warning(f"Could not find event '{noldus_start_event_name}' in the NeuroExplorer file. Setting to noldus_time_offset=0.")
         noldus_time_offset = 0.0
+    if aim_time_offset is None:
+        Warning(f"Could not find event '{aim_start_event_name}' in the NeuroExplorer file. Setting to aim_time_offset=0.")
+        aim_time_offset = 0.0
 
     # Run conversion
     conversion_options = dict(
         NeuroExplorerRecordingInterface=dict(
+            write_as="lfp",
             stub_test=stub_test
         ),
         NoldusInterface=dict(
@@ -90,7 +100,7 @@ def session_to_nwb(
         AIMScore=dict(
             timestamps_column_name="Time (minutes relative to injection)",
             aims_column_name="AIMS",
-            # reference_timestamps=
+            timestamp_offset=aim_time_offset
         )
     )
 

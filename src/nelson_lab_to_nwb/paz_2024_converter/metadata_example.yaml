@@ -19,45 +19,91 @@ Subject:
   sex: F
 Ophys:
   FiberPhotometry:
-    Fibers:
-      - location: Location of this fiber
-        coordinates: [0.0, 0.0, 0.0] # Fiber placement taxonomical coordinates in (AP, ML, Z) in mm relative to Bregma
-        notes: extra notes
-        fiber_model_number: The model number of the fiber
-        dichroic_model_number: The model number of the dichroic mirror
+    OpticalFibers:
+      - name: optical_fiber_1
+        description: text description fo this fiber
+        manufacturer: manufacturer name
+        model: model name
+        numerical_aperture: 0.00
+        core_diameter_in_um: 0.00
     ExcitationSources:
-      - source_type: laser # LED or laser
-        peak_wavelength: 465.0
+      - name: excitation_source_1
+        description: text description for this excitation source
+        model: model name
+        illumination_type: LED # or laser
+        excitation_wavelength_in_nm: 0.0
     Photodetectors:
-      - peak_wavelength: 500.0
-        type: PMT # PMT or photodiode
-        gain: 100.0
-        model_number: The model number of the photodetector
-    Fluorophores:
-      - label: dlight
-        location: VTA
-        emission_peak_wavelength: 500.0
-        excitation_peak_wavelength: 465.0
-        coordinates: [0.0, 0.0, 0.0] # Fluorophore injection site in taxonomical coordinates in (AP, ML, Z) in mm relative to Bregma
+      - name: photodetector_1
+        description: text description for this photodetector
+        model: model name
+        detector_type: PMT
+        detected_wavelength_in_nm: 000.0
+        gain: 0.0
+    Indicators:
+      - name: GCaMP6s
+        description: text description for this indicator
+        label: GCaMP6s
+        injection_location: VTA
+        injection_coordinates_in_mm: [3.0, 2.0, 1.0]
+    DichroicMirror:
+      - name: dichroic_mirror_1
+        description: text description for this dichroic mirror
+        model: model name
+        cut_on_wavelength_in_nm: 470.0
+        transmission_band_in_nm: [460.0, 480.0]
+        cut_off_wavelength_in_nm: 500.0
+        reflection_band_in_nm: [490.0, 520.0]
+        angle_of_incidence_in_degrees: 45.0
+    OpticalFilters:
+      - name: OpticalFilter405
+        description: The band-pass filter used to isolate the 405 nm excitation light.
+        manufacturer: Semrock
+        model: FF01-406/15-25
+        peak_wavelength_in_nm: 406.0
+        bandwidth_in_nm: [398.5, 413.5]
+        filter_type: Excitation
+      - name: OpticalFilter470
+        description: The filter used to isolate the 470 nm excitation light.
+        manufacturer: Semrock
+        model: FF02-472/30-25
+        peak_wavelength_in_nm: 472.0
+        bandwidth_in_nm: [457.5, 487.5]
+        filter_type: Excitation
+      - name: EmissionFilterGreen
+        description: The filter used to further filter the green fluorescence after it was separated from the excitation light by a dichroic mirror.
+        manufacturer: Semrock
+        model: FF01-540/50-25
+        peak_wavelength_in_nm: 540.0
+        bandwidth_in_nm: [515.5, 565.5]
+        filter_type: Emission
     FiberPhotometryResponseSeries:
       - name: _405A
         description: isosbestic signal
         unit: F
-        fibers: [0]
-        excitation_sources: [0]
-        photodetectors: [0]
-        fluorophores: [0]
+        indicator: GCaMP6f # Name of the Indicator
+        optical_fiber: optical_fiber_1 # Name of the Optical Fiber
+        excitation_source: excitation_source_1 # Name of the Excitation Source
+        photodetector: photodetector_1 # Name of the Photodetector
+        dichroic_mirror: dichroic_mirror_1 # Name of the Dichroic Mirror
+        excitation_filter: ExcitationFilter405 # Name of the Excitation Filter
+        emission_filter: EmissionFilterGreen # Name of the Emission Filter
       - name: _465A
         description: neuronal signal
         unit: F
-        fibers: [0]
-        excitation_sources: [0]
-        photodetectors: [0]
-        fluorophores: [0]
+        indicator: GCaMP6s
+        optical_fiber: optical_fiber_1
+        excitation_source: excitation_source_1
+        photodetector: photodetector_1
+        dichroic_mirror: dichroic_mirror_1
+        excitation_filter: ExcitationFilter470
+        emission_filter: EmissionFilterGreen
       - name: Fi1r
         description: raw light
         unit: F
-        fibers: [0]
-        excitation_sources: [0]
-        photodetectors: [0]
-        fluorophores: [0]
+        indicator: GCaMP6s
+        optical_fiber: optical_fiber_1
+        excitation_source: excitation_source_1
+        photodetector: photodetector_1
+        dichroic_mirror: dichroic_mirror_1
+        excitation_filter: ExcitationFilter470
+        emission_filter: EmissionFilterGreen
