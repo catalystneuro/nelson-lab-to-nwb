@@ -3,7 +3,7 @@ NWBFile:
   institution: University of California San Francisco
   lab: Nelson Lab
   experimenter:
-    - Last, First Middle
+    - Xiaowen, Zhuang
 Subject:
   subject_id: subid012345
   genotype: not defined

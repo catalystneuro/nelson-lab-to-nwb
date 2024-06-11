@@ -6,7 +6,6 @@ NWBFile:
   lab: Nelson Lab
   experimenter:
     - Creed, Rose
-    - Last, First Middle
 Subject:
   subject_id: subid012345
   genotype: not defined

@@ -1,5 +1,5 @@
 neuroconv>=0.4.9
-spikeinterface>=0.100.2
+spikeinterface>=0.100.6
 dandi>=0.61.2
 nwbwidgets==0.11.3
 nwbinspector==0.4.33
@@ -9,3 +9,4 @@ tdt==0.6.5
 PyYAML==6.0.1
 openpyxl==3.1.2
 pandas>=2.2.0
+opencv-python-headless

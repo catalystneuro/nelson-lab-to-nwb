@@ -52,6 +52,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         iterator_type: str = "v2",
         iterator_opts: Optional[dict] = None,
         include_units: bool = True,
+        units_suffix_ignore: list[str] = ["_wf", "_template"],
     ) -> None:
         super().add_to_nwbfile(
             nwbfile=nwbfile,
@@ -67,4 +68,17 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         )
 
         # Todo - add spike data
-        self.recording_header['spike_channels']
+        if include_units:
+            units_data = dict()
+            spike_channels = self.recording_header['spike_channels']
+            for ii, sc in enumerate(spike_channels):
+                if not any([suffix in sc[1] for suffix in units_suffix_ignore]):
+                    units_data[sc[1]] = dict(
+                        spike_times=self.neo_rec0.get_spike_timestamps(spike_channel_index=ii)
+                    )
+
+                    waveform_mean = self.neo_rec0.get_spike_raw_waveforms(spike_channel_index=ii)
+                    nwbfile.add_unit(
+                        spike_times=spike_times,
+                        waveform_mean=None,
+                    )
