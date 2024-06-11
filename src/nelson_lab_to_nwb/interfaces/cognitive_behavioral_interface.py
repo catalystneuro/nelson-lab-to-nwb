@@ -1,4 +1,3 @@
-from typing import Optional
 from pynwb import NWBFile
 from ndx_events import LabeledEvents
 from neuroconv import BaseDataInterface
@@ -34,10 +33,10 @@ class CognitiveBehavioralInterface(BaseDataInterface):
     def add_to_nwbfile(
         self,
         nwbfile: NWBFile,
-        metadata: Optional[dict] = dict(),
+        metadata: dict,
         events_column_name: str = "Event Name",
         events_times_column_name: str = "Event Time",
-        timestamp_offset_correction: float = 0.0
+        behavioral_events_time_offset: int = 0
     ) -> None:
         df = pd.read_csv(filepath_or_buffer=self.file_path)
 
@@ -56,11 +55,17 @@ class CognitiveBehavioralInterface(BaseDataInterface):
         df[events_times_column_name] = pd.to_timedelta(df[events_times_column_name])
         df[events_times_column_name] = df[events_times_column_name].dt.total_seconds()
 
+        # Apply time offset
+        t0 = pd.Timestamp(metadata["NWBFile"]["session_start_time"])
+        t1 = df["Date"][0]
+        offset = pd.Timedelta(seconds=behavioral_events_time_offset * 3600)
+        offset_in_seconds = (t1 + offset - t0).total_seconds()
+
         # create a new LabeledEvents type to hold behavioral events
         events = LabeledEvents(
             name='CognitiveBehavioral_Raw',
             description='Cognitive behavioral raw events.',
-            timestamps=df["Event Time"].values,
+            timestamps=df["Event Time"].values + offset_in_seconds,
             data=df["Event Name Factorized"].values,
             labels=list(unique_event_names)
         )
