@@ -12,7 +12,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="nelson-lab-to-nwb",
-    version="0.0.1",
+    version="0.0.2",
     description="NWB conversion scripts, functions, and classes for Nelson Lab conversion",
     long_description=long_description,
     long_description_content_type="text/markdown",
