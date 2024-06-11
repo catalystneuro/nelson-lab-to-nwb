@@ -3,6 +3,7 @@ from nelson_lab_to_nwb.interfaces import (
     AIMScoreInterface
 )
 from neuroconv import NWBConverter
+from neuroconv.datainterfaces import VideoInterface
 
 
 class IntanSessionNWBConverter(NWBConverter):
@@ -10,5 +11,6 @@ class IntanSessionNWBConverter(NWBConverter):
 
     data_interface_classes = dict(
         IntanMultifilesRaw=IntanMultifilesRecordingInterface,
-        AIMScore=AIMScoreInterface
+        AIMScore=AIMScoreInterface,
+        BehavioralVideo=VideoInterface,
     )
