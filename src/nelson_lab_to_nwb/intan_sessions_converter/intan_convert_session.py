@@ -9,9 +9,9 @@ def session_to_nwb(
     output_folder_path: FolderPathType,
     intan_folder_path: FilePathType,
     aim_score_file_path: FilePathType,
-
     behavioral_video_file_path: FilePathType,
     user_metadata_file_path: FilePathType,
+    injection_time_in_seconds: float = 0.0,
     stub_test: bool = False,
     overwrite: bool = False,
     verbose: bool = True,
@@ -70,7 +70,11 @@ def session_to_nwb(
 
     # Conversion options
     conversion_options = dict(
-
+        AIMScore=dict(
+            timestamps_column_name="Time (minutes relative to injection)",
+            aims_column_name="AIMS",
+            timestamp_offset=injection_time_in_seconds,
+        ),
     )
 
     subject_id = metadata.get("Subject").get("subject_id")
