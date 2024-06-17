@@ -9,7 +9,8 @@ def session_to_nwb(
     output_folder_path: FolderPathType,
     intan_folder_path: FilePathType,
     aim_score_file_path: FilePathType,
-    behavioral_video_file_path: FilePathType,
+    top_behavioral_video_file_path: FilePathType,
+    side_behavioral_video_file_path: FilePathType,
     user_metadata_file_path: FilePathType,
     injection_time_in_seconds: float = 0.0,
     stub_test: bool = False,
@@ -26,8 +27,10 @@ def session_to_nwb(
         Path to the Intan folder containing the .rhd data files.
     aim_score_file_path : FilePathType
         Path to the AIM score file (.csv, .xlsx).
-    behavioral_video_file_path : FilePathType
-        Path to the behavioral video file (.mp4, .avi).
+    top_behavioral_video_file_path : FilePathType
+        Path to the top recording behavioral video file (.mp4, .avi).
+    side_behavioral_video_file_path : FilePathType
+        Path to the side recording behavioral video file (.mp4, .avi).
     user_metadata_file_path : FilePathType
         Path to the user metadata file (.yaml).
     stub_test : bool, optional (default False)
@@ -54,8 +57,14 @@ def session_to_nwb(
             file_path=aim_score_file_path,
             verbose=verbose
         ),
-        BehavioralVideo=dict(
-            file_paths=[behavioral_video_file_path],
+        BehavioralVideoTop=dict(
+            file_paths=[top_behavioral_video_file_path],
+            metadata_key_name="VideoTop",
+            verbose=verbose
+        ),
+        BehavioralVideoSide=dict(
+            file_paths=[side_behavioral_video_file_path],
+            metadata_key_name="VideoSide",
             verbose=verbose
         ),
     )
