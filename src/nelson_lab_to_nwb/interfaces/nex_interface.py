@@ -20,6 +20,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         self,
         file_path: FilePathType,
         es_key: str = "ElectricalSeries",
+        channels_to_remove: list = ["Laser", "AD50"],
         verbose: bool = True,
     ):
         from spikeinterface.extractors.neoextractors.neuroexplorer import NeuroExplorerRecordingExtractor
@@ -29,8 +30,22 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         streams_names = NeuroExplorerRecordingExtractor.get_streams(file_path=file_path)[0]
 
         # Because this recorder only extracts one channel at a time, we need to aggregate the channels
-        recording_list = [NeuroExplorerRecordingExtractor(file_path=file_path, stream_name=stream_name) for stream_name in streams_names]
+        recording_list = [
+            NeuroExplorerRecordingExtractor(file_path=file_path, stream_name=stream_name)
+            for stream_name in streams_names
+        ]
         self.recording_extractor = aggregate_channels(recording_list)
+
+        # Remove extra channels: "Laser" and "AD50"
+        ids_to_remove = list()
+        for i in self.recording_extractor.channel_ids:
+            name = self.recording_extractor.get_channel_property(channel_id=i, key="channel_name")
+            if name in channels_to_remove:
+                ids_to_remove.append(i)
+        self.recording_extractor = self.recording_extractor.remove_channels(remove_channel_ids=ids_to_remove)
+
+        # TODO: Add probe information
+        # self.recording_extractor.set_probe()
 
         self.neo_rec0 = recording_list[0].neo_reader
         self.recording_header = self.neo_rec0.header

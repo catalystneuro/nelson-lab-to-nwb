@@ -11,6 +11,7 @@ def session_to_nwb(
     noldus_file_path: FilePathType,
     aim_score_file_path: FilePathType,
     metadata_file_path: FilePathType,
+    channel_names_to_remove: list = ["Laser", "AD50"],
     noldus_start_event_name: str = "Noldus Start",
     noldus_variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
     aim_start_event_name: str = "Keyboard1",
@@ -33,6 +34,8 @@ def session_to_nwb(
         Path to the AIMScore (.xlsx) file.
     metadata_file_path : FilePathType
         Path to the metadata (.json) file.
+    channel_names_to_remove : list, optional (default ["Laser", "AD50"])
+        Names of the channels to remove from the NeuroExplorer file, by default ["Laser", "AD50"].
     noldus_start_event_name : str, optional (default "Noldus Start")
         Name of the event in the NeuroExplorer file that marks the start of the Noldus recording, by default "Noldus Start".
     noldus_variables_columns_names : list, optional (default ["Elongation", "Velocity", "Distance moved", "Rotation"])
@@ -57,7 +60,8 @@ def session_to_nwb(
     # Initialize converter
     source_data = dict(
         NeuroExplorerRecordingInterface=dict(
-            file_path=nex_file_path
+            file_path=nex_file_path,
+            channels_to_remove=channel_names_to_remove
         ),
         NoldusInterface=dict(
             file_path=noldus_file_path
