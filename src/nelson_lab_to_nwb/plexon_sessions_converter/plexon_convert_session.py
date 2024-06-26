@@ -6,13 +6,14 @@ from neuroconv.utils import FilePathType, FolderPathType
 
 def session_to_nwb(
     *,
+    output_folder_path: FolderPathType,
     nex_file_path: FilePathType,
     noldus_file_path: FilePathType,
     aim_score_file_path: FilePathType,
     metadata_file_path: FilePathType,
-    output_folder_path: FolderPathType,
     noldus_start_event_name: str = "Noldus Start",
     aim_start_event_name: str = "Keyboard1",
+    include_units: bool = True,
     stub_test: bool = False,
     overwrite: bool = False,
     verbose: bool = True,
@@ -21,6 +22,8 @@ def session_to_nwb(
 
     Parameters
     ----------
+    output_folder_path : FolderPathType
+        Path to the output folder.
     nex_file_path : FilePathType
         Path to the NeuroExplorer (.nex) file.
     noldus_file_path : FilePathType
@@ -29,8 +32,8 @@ def session_to_nwb(
         Path to the AIMScore (.xlsx) file.
     metadata_file_path : FilePathType
         Path to the metadata (.json) file.
-    output_folder_path : FolderPathType
-        Path to the output folder.
+    include_units : bool, optional (default True)
+        Whether to include units from .nex file in the output NWB file, by default True.
     stub_test : bool, optional (default False)
         Whether to run the conversion in stub test mode, by default False.
     overwrite : bool, optional (default False)
@@ -38,7 +41,7 @@ def session_to_nwb(
     verbose : bool, optional (default True)
         Whether to print verbose output, by default True.
     """
-    from nelson_lab_to_nwb.creed_2024 import Creed2024NWBConverter
+    from nelson_lab_to_nwb.plexon_sessions_converter import PlexonNWBConverter
 
     # Create output folder, if it doesn't exist
     output_folder = Path(output_folder_path)
@@ -56,7 +59,7 @@ def session_to_nwb(
             file_path=aim_score_file_path
         )
     )
-    converter = Creed2024NWBConverter(source_data=source_data, verbose=verbose)
+    converter = PlexonNWBConverter(source_data=source_data, verbose=verbose)
 
     # Load and update metadata
     converter_metadata = converter.get_metadata()
@@ -90,7 +93,8 @@ def session_to_nwb(
     conversion_options = dict(
         NeuroExplorerRecordingInterface=dict(
             write_as="lfp",
-            stub_test=stub_test
+            stub_test=stub_test,
+            include_units=include_units
         ),
         NoldusInterface=dict(
             variables_columns_names=["Elongation", "Velocity", "Distance moved", "Rotation"],
