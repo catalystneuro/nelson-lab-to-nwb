@@ -2,6 +2,7 @@ from typing import Optional, Literal
 from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
 from neuroconv.utils import FilePathType
 from pynwb import NWBFile
+import numpy as np
 
 
 class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
@@ -66,19 +67,17 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             iterator_type=iterator_type,
             iterator_opts=iterator_opts,
         )
-
-        # Todo - add spike data
         if include_units:
             units_data = dict()
             spike_channels = self.recording_header['spike_channels']
+            spike_channels_ind_dict = {sc[0]: ii for ii, sc in enumerate(spike_channels)}
             for ii, sc in enumerate(spike_channels):
-                if not any([suffix in sc[1] for suffix in units_suffix_ignore]):
-                    units_data[sc[1]] = dict(
-                        spike_times=self.neo_rec0.get_spike_timestamps(spike_channel_index=ii)
-                    )
-
-                    waveform_mean = self.neo_rec0.get_spike_raw_waveforms(spike_channel_index=ii)
-                    nwbfile.add_unit(
-                        spike_times=spike_times,
+                if not any([suffix in sc[0] for suffix in units_suffix_ignore]):
+                    units_data = dict(
+                        spike_times=self.neo_rec0.get_spike_timestamps(spike_channel_index=ii),
                         waveform_mean=None,
                     )
+                    if sc[0] + "_template" in spike_channels_ind_dict:
+                        sc_ind = spike_channels_ind_dict[sc[0] + "_template"]
+                        units_data["waveform_mean"] = np.squeeze(self.neo_rec0.get_spike_raw_waveforms(spike_channel_index=sc_ind))
+                    nwbfile.add_unit(**units_data)

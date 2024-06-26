@@ -12,6 +12,7 @@ def session_to_nwb(
     aim_score_file_path: FilePathType,
     metadata_file_path: FilePathType,
     noldus_start_event_name: str = "Noldus Start",
+    noldus_variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
     aim_start_event_name: str = "Keyboard1",
     include_units: bool = True,
     stub_test: bool = False,
@@ -32,6 +33,12 @@ def session_to_nwb(
         Path to the AIMScore (.xlsx) file.
     metadata_file_path : FilePathType
         Path to the metadata (.json) file.
+    noldus_start_event_name : str, optional (default "Noldus Start")
+        Name of the event in the NeuroExplorer file that marks the start of the Noldus recording, by default "Noldus Start".
+    noldus_variables_columns_names : list, optional (default ["Elongation", "Velocity", "Distance moved", "Rotation"])
+        Names of the columns in the Noldus file that contain the variables of interest, by default ["Elongation", "Velocity", "Distance moved", "Rotation"].
+    aim_start_event_name : str, optional (default "Keyboard1")
+        Name of the event in the NeuroExplorer file that marks the start of the AIMScore recording, by default "Keyboard1".
     include_units : bool, optional (default True)
         Whether to include units from .nex file in the output NWB file, by default True.
     stub_test : bool, optional (default False)
@@ -97,7 +104,7 @@ def session_to_nwb(
             include_units=include_units
         ),
         NoldusInterface=dict(
-            variables_columns_names=["Elongation", "Velocity", "Distance moved", "Rotation"],
+            variables_columns_names=noldus_variables_columns_names,
             timestamps_column_name="Trial time",
             timestamp_offset=noldus_time_offset
         ),

@@ -13,11 +13,12 @@
 from nelson_lab_to_nwb.plexon_sessions_converter import session_to_nwb
 
 output_file_path = session_to_nwb(
+    output_folder_path="converted_session",
     nex_file_path="/path_to/file.nex",
     noldus_file_path="/path_to/file.xlsx",
     aim_score_file_path="/path_to/file.xlsx",
     metadata_file_path="/path_to/metadata.yaml",
-    output_folder_path="converted_session",
+    include_units=True,
     stub_test=False,
     overwrite=True,
     verbose=True,
