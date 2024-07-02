@@ -51,7 +51,6 @@ class AIMScoreInterface(BaseDataInterface):
         metadata: Optional[dict] = dict(),
         timestamps_column_name: str = "Time (minutes relative to injection)",
         aims_column_name: str = "AIMS",
-        reference_timestamps: Union[list[float], np.ndarray, None] = None,
         timestamp_offset: float = 0.0
     ) -> None:
         # Read file into DataFrame

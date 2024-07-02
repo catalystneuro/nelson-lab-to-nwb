@@ -6,8 +6,8 @@ from nelson_lab_to_nwb.interfaces import (
 from neuroconv import NWBConverter
 
 
-class Creed2024NWBConverter(NWBConverter):
-    """Primary conversion class for Creed experimental data."""
+class PlexonNWBConverter(NWBConverter):
+    """Primary conversion class for Plexon sessions data, pre-converted to Neuroexplorer format (.nex)."""
 
     data_interface_classes = dict(
         NeuroExplorerRecordingInterface=NeuroExplorerRecordingInterface,
