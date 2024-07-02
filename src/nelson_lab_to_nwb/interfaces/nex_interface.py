@@ -45,6 +45,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         self.recording_extractor = self.recording_extractor.remove_channels(remove_channel_ids=ids_to_remove)
 
         # TODO: Add probe information
+        # https://probeinterface.readthedocs.io/en/main/index.html
         # self.recording_extractor.set_probe()
 
         self.neo_rec0 = recording_list[0].neo_reader
