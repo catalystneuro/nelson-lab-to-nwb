@@ -4,6 +4,8 @@ from neuroconv.utils import FilePathType
 from pynwb import NWBFile
 import numpy as np
 
+from nelson_lab_to_nwb.utils.probe import set_probe
+
 
 class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
     """
@@ -44,9 +46,8 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
                 ids_to_remove.append(i)
         self.recording_extractor = self.recording_extractor.remove_channels(remove_channel_ids=ids_to_remove)
 
-        # TODO: Add probe information
-        # https://probeinterface.readthedocs.io/en/main/index.html
-        # self.recording_extractor.set_probe()
+        # Add probe information: https://probeinterface.readthedocs.io/en/main/index.html
+        set_probe(self.recording_extractor)
 
         self.neo_rec0 = recording_list[0].neo_reader
         self.recording_header = self.neo_rec0.header
