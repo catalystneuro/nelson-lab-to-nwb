@@ -2,6 +2,7 @@ from typing import Optional, Literal
 from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
 from neuroconv.utils import FilePathType
 from pynwb import NWBFile
+from pynwb.ogen import OptogeneticSeries
 import numpy as np
 
 from nelson_lab_to_nwb.utils.probe import set_probe
@@ -71,6 +72,8 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         iterator_opts: Optional[dict] = None,
         include_units: bool = True,
         units_suffix_ignore: list[str] = ["_wf", "_template"],
+        ogen_event_name: str = "Laser",
+        ogen_ttl_samplig_rate: float = 40000.,
     ) -> None:
         super().add_to_nwbfile(
             nwbfile=nwbfile,
@@ -84,6 +87,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             iterator_type=iterator_type,
             iterator_opts=iterator_opts,
         )
+        # Units
         if include_units:
             units_data = dict()
             spike_channels = self.recording_header['spike_channels']
@@ -98,3 +102,26 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
                         sc_ind = spike_channels_ind_dict[sc[0] + "_template"]
                         units_data["waveform_mean"] = np.squeeze(self.neo_rec0.get_spike_raw_waveforms(spike_channel_index=sc_ind))
                     nwbfile.add_unit(**units_data)
+
+        # # Optogenetic events
+        # ogen_event_id = None
+        # for ev in self.neo_rec0.header.get("event_channels", []):
+        #     if ev[0] == ogen_event_name:
+        #         ogen_event_id = int(ev[1])
+
+        # if ogen_event_id is None:
+        #     print(f"Optogenetic event with name {ogen_event_name} was not found.")
+        # else:
+        #     ogen_timestamps = self.neo_rec0.get_event_timestamps(event_channel_index=ogen_event_id)[0] / ogen_ttl_samplig_rate
+        #     ogen_metadata = metadata.get("Ogen", dict())
+        #     device = nwbfile.create_device(**ogen_metadata.get("Device", dict()))
+        #     site_metadata = ogen_metadata.get("StimulusSite", dict())
+        #     site_metadata["device"] = device
+        #     ogen_site = nwbfile.create_ogen_site(**site_metadata)
+        #     ogen_series = OptogeneticSeries(
+        #         name="OptogeneticSeries",
+        #         data=np.random.randn(20),  # watts
+        #         site=ogen_site,
+        #         rate=1.0,  # Hz
+        #     )
+        #     nwbfile.add_stimulus(ogen_series)
