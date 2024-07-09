@@ -1,12 +1,13 @@
 from pathlib import Path
 from packaging.version import Version
 from pynwb.ecephys import ElectricalSeries
-
 from neuroconv.utils import FolderPathType, get_schema_from_hdmf_class
 from neuroconv.tools import get_package_version
 from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
 from spikeinterface.extractors import read_intan
 from spikeinterface import concatenate_recordings
+
+from nelson_lab_to_nwb.utils.probe import set_probe
 
 
 def make_concatenate_extractor(folder_path: FolderPathType, stream_id: str = "0"):
@@ -90,6 +91,9 @@ class IntanMultifilesRecordingInterface(BaseRecordingExtractorInterface):
 
         if any(custom_names):
             self.recording_extractor.set_property(key="custom_channel_name", ids=channel_ids, values=custom_names)
+
+        # Add probe information: https://probeinterface.readthedocs.io/en/main/index.html
+        set_probe(self.recording_extractor)
 
     def get_metadata_schema(self) -> dict:
         metadata_schema = super().get_metadata_schema()

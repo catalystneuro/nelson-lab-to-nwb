@@ -13,3 +13,16 @@ Subject:
   species: Mus musculus
   date_of_birth: 2023-03-17T00:00:00-07:00
   sex: F
+Ogen:
+  Device:
+    name: 150mW DPSS 473nm Blue Laser
+    description: 473nm laser
+    manufacturer: Shanghai Laser & Optics Century
+  StimulusSite:
+    name: OptogeneticStimulusSite
+    description: |
+      DIO-ChR1 in left DLS, 4000 light pulses 0.5, 1, 2, 4 mW
+    excitation_lambda: 473
+    location: left DLS
+  OptogeneticSeries:
+    name: OptogeneticSeries
