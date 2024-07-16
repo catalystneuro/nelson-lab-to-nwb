@@ -26,3 +26,5 @@ class BlackrockNWBConverter(NWBConverter):
         # Add probe information: https://probeinterface.readthedocs.io/en/main/index.html
         set_probe(self.data_interface_objects["BlackrockRaw"].recording_extractor)
         set_probe(self.data_interface_objects["BlackrockLFP"].recording_extractor)
+
+        # Align video timestamps

@@ -33,6 +33,8 @@ def session_to_nwb(
         Path to the side recording behavioral video file (.mp4, .avi).
     user_metadata_file_path : FilePathType
         Path to the user metadata file (.yaml).
+    injection_time_in_seconds : float, optional (default 0.0)
+        Time of injection in seconds, used to synchronize AIM scores. Default 0.0.
     stub_test : bool, optional (default False)
         Whether to run the conversion in stub test mode, by default False.
     overwrite : bool, optional (default False)
