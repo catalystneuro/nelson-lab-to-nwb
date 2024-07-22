@@ -12,5 +12,5 @@ class PlexonNWBConverter(NWBConverter):
     data_interface_classes = dict(
         NeuroExplorerRecordingInterface=NeuroExplorerRecordingInterface,
         NoldusInterface=NoldusInterface,
-        AIMScore=AIMScoreInterface
+        AIMScore=AIMScoreInterface,
     )

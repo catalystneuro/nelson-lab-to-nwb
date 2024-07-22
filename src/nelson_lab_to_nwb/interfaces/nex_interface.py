@@ -8,6 +8,18 @@ import numpy as np
 from nelson_lab_to_nwb.utils.probe import set_probe
 
 
+def reconstruct_ttl_signal(rise_timestamps, step_duration, amplitudes, reconstruction_sampling_rate=1000):
+    total_time = rise_timestamps[-1] + step_duration + 1.
+    num_samples = int(total_time * reconstruction_sampling_rate)  # Convert total_time (seconds) to samples
+    time_vector = np.linspace(0, total_time, num_samples)
+    ttl_signal = np.zeros(num_samples)
+    for i, rise_time in enumerate(rise_timestamps):
+        start_sample = int(rise_time * reconstruction_sampling_rate)
+        end_sample = start_sample + int(step_duration * reconstruction_sampling_rate)
+        ttl_signal[start_sample:end_sample] = amplitudes[i]
+    return time_vector, ttl_signal
+
+
 class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
     """
     Primary data interface class for converting NeuroExplorer data using the
@@ -71,9 +83,10 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         iterator_type: str = "v2",
         iterator_opts: Optional[dict] = None,
         include_units: bool = True,
-        units_suffix_ignore: list[str] = ["_wf", "_template"],
+        units_suffix_ignore: list = ["_wf", "_template"],
         ogen_event_name: str = "Laser",
         ogen_ttl_samplig_rate: float = 40000.,
+        ogen_amplitudes_array: list = [],
     ) -> None:
         super().add_to_nwbfile(
             nwbfile=nwbfile,
@@ -103,25 +116,45 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
                         units_data["waveform_mean"] = np.squeeze(self.neo_rec0.get_spike_raw_waveforms(spike_channel_index=sc_ind))
                     nwbfile.add_unit(**units_data)
 
-        # # Optogenetic events
-        # ogen_event_id = None
-        # for ev in self.neo_rec0.header.get("event_channels", []):
-        #     if ev[0] == ogen_event_name:
-        #         ogen_event_id = int(ev[1])
+        # Optogenetic stimulus
+        ogen_event_id = None
+        for ev in self.neo_rec0.header.get("event_channels", []):
+            if ev[0] == ogen_event_name:
+                ogen_event_id = int(ev[1])
 
-        # if ogen_event_id is None:
-        #     print(f"Optogenetic event with name {ogen_event_name} was not found.")
-        # else:
-        #     ogen_timestamps = self.neo_rec0.get_event_timestamps(event_channel_index=ogen_event_id)[0] / ogen_ttl_samplig_rate
-        #     ogen_metadata = metadata.get("Ogen", dict())
-        #     device = nwbfile.create_device(**ogen_metadata.get("Device", dict()))
-        #     site_metadata = ogen_metadata.get("StimulusSite", dict())
-        #     site_metadata["device"] = device
-        #     ogen_site = nwbfile.create_ogen_site(**site_metadata)
-        #     ogen_series = OptogeneticSeries(
-        #         name="OptogeneticSeries",
-        #         data=np.random.randn(20),  # watts
-        #         site=ogen_site,
-        #         rate=1.0,  # Hz
-        #     )
-        #     nwbfile.add_stimulus(ogen_series)
+        if ogen_event_id is None:
+            print(f"Optogenetic event with name {ogen_event_name} was not found.")
+        else:
+            # Add OptogeneticSeries
+            ogen_metadata = metadata.get("Ogen", dict())
+            device = nwbfile.create_device(**ogen_metadata.get("Device", dict()))
+            site_metadata = ogen_metadata.get("StimulusSite", dict())
+            site_metadata["device"] = device
+            ogen_site = nwbfile.create_ogen_site(**site_metadata)
+            ogen_timestamps = self.neo_rec0.get_event_timestamps(event_channel_index=ogen_event_id)[0] / ogen_ttl_samplig_rate
+            if not ogen_amplitudes_array:
+                ogen_amplitudes_array = np.array([0.5] * 1000 + [1.] * 1000 + [2.] * 1000 + [4.] * 1000) * 0.001
+            ttl_times, ttl_signal = reconstruct_ttl_signal(
+                rise_timestamps=ogen_timestamps,
+                step_duration=0.15,
+                amplitudes=ogen_amplitudes_array,
+            )
+            ogen_series = OptogeneticSeries(
+                name="OptogeneticSeries",
+                data=ttl_signal,
+                site=ogen_site,
+                timestamps=ttl_times,
+            )
+            nwbfile.add_stimulus(ogen_series)
+
+            # Add Optogenetics stimulation as trials
+            nwbfile.add_trial_column(
+                name="stimulus_amplitude",
+                description="Amplitude of the optogenetic stimulus",
+            )
+            for i, start_time in enumerate(ogen_timestamps):
+                nwbfile.add_trial(
+                    start_time=start_time,
+                    stop_time=start_time + 0.15,
+                    stimulus_amplitude=ogen_amplitudes_array[i],
+                )

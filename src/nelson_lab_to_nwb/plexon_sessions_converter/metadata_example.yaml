@@ -22,7 +22,7 @@ Ogen:
     name: OptogeneticStimulusSite
     description: |
       DIO-ChR1 in left DLS, 4000 light pulses 0.5, 1, 2, 4 mW
-    excitation_lambda: 473
+    excitation_lambda: 473.0
     location: left DLS
   OptogeneticSeries:
     name: OptogeneticSeries

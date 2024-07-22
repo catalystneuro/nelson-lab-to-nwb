@@ -1,5 +1,6 @@
 """Primary script to run to convert sessions using the NWBConverter."""
 from pathlib import Path
+from typing import Optional
 from neuroconv.utils import load_dict_from_file, dict_deep_update
 from neuroconv.utils import FilePathType, FolderPathType
 
@@ -16,9 +17,11 @@ def session_to_nwb(
     noldus_variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
     aim_start_event_name: str = "Keyboard1",
     include_units: bool = True,
-    stub_test: bool = False,
-    overwrite: bool = False,
-    verbose: bool = True,
+    ogen_event_name: str = "Laser",
+    ogen_amplitudes_array: list = [],
+    stub_test: Optional[bool] = False,
+    overwrite: Optional[bool] = False,
+    verbose: Optional[bool] = True,
 ):
     """Convert a session to NWB.
 
@@ -44,6 +47,12 @@ def session_to_nwb(
         Name of the event in the NeuroExplorer file that marks the start of the AIMScore recording, by default "Keyboard1".
     include_units : bool, optional (default True)
         Whether to include units from .nex file in the output NWB file, by default True.
+    ogen_event_name : str, optional (default "Laser")
+        Name of the event channel in the NeuroExplorer file containing the Optogenetics stimulation signal, by default "Laser".
+    ogen_amplitudes_array : list, optional (default [])
+        Array of amplitudes (in Watts) for the Optogenetics stimulation signal.
+        If not explicitly provided, the amplitudes used will be:
+        1-1000: 0.5 mW, 1001-2000: 1 mW, 2001-3000: 2 mW, 3001-4000: 4 mW.
     stub_test : bool, optional (default False)
         Whether to run the conversion in stub test mode, by default False.
     overwrite : bool, optional (default False)
@@ -105,7 +114,11 @@ def session_to_nwb(
         NeuroExplorerRecordingInterface=dict(
             write_as="lfp",
             stub_test=stub_test,
-            include_units=include_units
+            include_units=include_units,
+            units_suffix_ignore=["_wf", "_template"],
+            ogen_event_name=ogen_event_name,
+            ogen_ttl_samplig_rate=40000.,
+            ogen_amplitudes_array=ogen_amplitudes_array,
         ),
         NoldusInterface=dict(
             variables_columns_names=noldus_variables_columns_names,
