@@ -1,14 +1,19 @@
 NWBFile:
   session_start_time: 2024-02-05T12:09:54-07:00
-  session_description: Intan recording session
+  session_description: Day 1 of levodopa.
   institution: University of California San Francisco
   lab: Nelson Lab
   experimenter:
-    - Last, First Middle
+    - Marcott, Pamela
+  surgery: |
+    injection of 1ul of 5ug/ul of 6-OHDA HBr into left MFB (-1AP; -1.1 ML; -4.8DV from bregma)
+    and 500ul of 1:4 DIO-ChR2 into left DLS (+0.8AP; -2.4ML; -3DV from bregma) and 32Ch Array
+  virus: AAV5-EF1a-DIO-hCHR2(H134R)-eYFP-wpre-hGH
+  pharmacology: "Levodopa concentration: 5mg/kg."
 Subject:
-  subject_id: subid012345
-  genotype: not defined
-  description: not defined
+  subject_id: pm231213a
+  genotype: D1-Cre
+  description: 6-OHDA left MFB; DIO-ChR2 DLS; 32Ch Array DLS
   species: Mus musculus
-  date_of_birth: 2023-03-17T00:00:00
-  sex: F
+  date_of_birth: 2023-08-30T00:00:00
+  sex: M

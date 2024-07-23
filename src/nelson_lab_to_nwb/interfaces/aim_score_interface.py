@@ -7,6 +7,9 @@ import numpy as np
 
 
 def find_header_row(file_path, header_names: list) -> Optional[int]:
+    """
+    Find the header row in an Excel file containing specific keywords.
+    """
     with pd.ExcelFile(file_path, engine='openpyxl') as xls:
         # Loop through each row in the first sheet
         for sheet_name in xls.sheet_names:
@@ -17,6 +20,45 @@ def find_header_row(file_path, header_names: list) -> Optional[int]:
                     return row_idx
     # Return None if no header is found
     return None
+
+
+def expand_aims_to_seconds(
+    df: pd.DataFrame,
+    timestamps_column_name: str,
+    aims_column_name: str,
+    timestamp_offset: float = 0.0
+):
+    """
+    Expand the AIMS score data to seconds.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing the AIMS score data.
+        timestamps_column_name (str): Name of the column containing the timestamps.
+        aims_column_name (str): Name of the column containing the AIMS scores.
+        timestamp_offset (float, optional): Offset to add to the timestamps. Defaults to 0.0.
+
+    Returns:
+        tuple: Expanded time array and expanded AIMS score
+    """
+    times = df[timestamps_column_name].values * 60 + timestamp_offset
+    values = df[aims_column_name].values
+
+    # Find the range of the expanded time array
+    min_time = times[0]
+    max_time = times[-1]
+
+    # Create the expanded arrays
+    expanded_times = np.arange(min_time, max_time + 1)
+    expanded_values = np.zeros_like(expanded_times)
+
+    # Fill the expanded values array
+    value_idx = 0
+    for i, t in enumerate(expanded_times):
+        if value_idx < len(times) - 1 and t >= times[value_idx + 1]:
+            value_idx += 1
+        expanded_values[i] = values[value_idx]
+
+    return (expanded_times, expanded_values)
 
 
 class AIMScoreInterface(BaseDataInterface):
@@ -51,7 +93,6 @@ class AIMScoreInterface(BaseDataInterface):
         metadata: Optional[dict] = dict(),
         timestamps_column_name: str = "Time (minutes relative to injection)",
         aims_column_name: str = "AIMS",
-        reference_timestamps: Union[list[float], np.ndarray, None] = None,
         timestamp_offset: float = 0.0
     ) -> None:
         # Read file into DataFrame
@@ -76,12 +117,17 @@ class AIMScoreInterface(BaseDataInterface):
             )
         else:
             behavior_module = nwbfile.processing["behavior"]
-        data = df[aims_column_name].values
-        timestamps = df[timestamps_column_name].values * 60 + timestamp_offset
+
+        expanded_times, expanded_values = expand_aims_to_seconds(
+            df=df,
+            timestamps_column_name=timestamps_column_name,
+            aims_column_name=aims_column_name,
+            timestamp_offset=timestamp_offset,
+        )
         aims_ts = TimeSeries(
             name="aims",
-            data=data,
+            data=expanded_values,
             unit="na",
-            timestamps=timestamps
+            timestamps=expanded_times,
         )
         behavior_module.add(aims_ts)

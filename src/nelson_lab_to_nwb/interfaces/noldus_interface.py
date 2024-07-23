@@ -87,7 +87,9 @@ class NoldusInterface(BaseDataInterface):
             behavior_module = nwbfile.processing["behavior"]
         timestamps = self.df["synced_timestamps"].values
         for var_name in variables_columns_names:
-            self.df[var_name] = self.df[var_name].replace('-', 0).infer_objects()
+            # self.df[var_name] = self.df[var_name].replace('-', 0).infer_objects()
+            self.df[var_name] = self.df[var_name].replace('-', 0)
+            self.df[var_name] = self.df[var_name].infer_objects(copy=False)
             data = self.df[var_name].values
             ts = TimeSeries(
                 name=var_name,
