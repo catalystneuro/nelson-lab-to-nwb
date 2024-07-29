@@ -12,9 +12,9 @@ def session_to_nwb(
     aim_score_file_path: FilePathType,
     behavioral_video_file_path: FilePathType,
     user_metadata_file_path: FilePathType,
-    noldus_start_event_name: str = "Noldus Start",
     noldus_variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
-    aim_start_event_name: str = "Keyboard1",
+    noldus_epoc_name: str = "Cam2",
+    aim_epoc_name: str = "TTL1",
     overwrite: bool = False,
     verbose: bool = True,
 ):
@@ -34,12 +34,12 @@ def session_to_nwb(
         Path to the behavioral video file (.mp4, .avi).
     user_metadata_file_path : FilePathType
         Path to the user metadata file (.yaml).
-    noldus_start_event_name : str, optional (default "Noldus Start")
-        Name of the event in the NeuroExplorer file that marks the start of the Noldus recording, by default "Noldus Start".
     noldus_variables_columns_names : list, optional (default ["Elongation", "Velocity", "Distance moved", "Rotation"])
         Names of the columns in the Noldus file that contain the variables of interest, by default ["Elongation", "Velocity", "Distance moved", "Rotation"].
-    aim_start_event_name : str, optional (default "Keyboard1")
-        Name of the event in the NeuroExplorer file that marks the start of the AIMScore recording, by default "Keyboard1".
+    noldus_epoc_name : str, optional (default "Cam2")
+        Name of the epoc in the TDT data that marks the start of the Noldus recording, by default "Cam2".
+    aim_epoc_name : str, optional (default "TTL1")
+        Name of the epoc in the TDT data that marks the start of the AIM score recording, by default "TTL1".
     overwrite : bool, optional (default False)
         Whether to overwrite the output NWB file, by default False.
     verbose : bool, optional (default True)
@@ -78,15 +78,18 @@ def session_to_nwb(
 
     # Get events from the TDT data for synchronization
     tdt_events = converter.data_interface_objects.get("FiberPhotometry").get_events()
-    aim_time_offset = tdt_events.get(aim_start_event_name).get("onset")[0]
-    noldus_time_offset = 0.0
+    aim_time_offset = tdt_events.get(aim_epoc_name).get("onset")[0]
+
+    noldus_timestamps = tdt_events.get(noldus_epoc_name).get("onset")
+    noldus_df = converter.data_interface_objects.get("NoldusInterface").get_dataframe()
+    noldus_synced_timestamps = list(noldus_timestamps[-noldus_df.shape[0]:])
 
     # Conversion options
     conversion_options = dict(
         NoldusInterface=dict(
             variables_columns_names=noldus_variables_columns_names,
             timestamps_column_name="Trial time",
-            timestamp_offset=noldus_time_offset,
+            synced_timestamps=noldus_synced_timestamps,
         ),
         AIMScore=dict(
             timestamps_column_name="Time (minutes relative to injection)",
