@@ -87,15 +87,17 @@ class AIMScoreInterface(BaseDataInterface):
         )
         self.file_path = file_path
 
-    def add_to_nwbfile(
+    def get_dataframe(
         self,
-        nwbfile: NWBFile,
-        metadata: Optional[dict] = dict(),
         timestamps_column_name: str = "Time (minutes relative to injection)",
-        aims_column_name: str = "AIMS",
-        timestamp_offset: float = 0.0
-    ) -> None:
-        # Read file into DataFrame
+        aims_column_name: str = "AIMS"
+    ) -> pd.DataFrame:
+        """
+        Read the AIM score behavior data file into a DataFrame.
+
+        Returns:
+            pd.DataFrame: DataFrame containing the AIM score behavior data.
+        """
         header_row = find_header_row(
             file_path=self.file_path,
             header_names=[timestamps_column_name, aims_column_name]
@@ -107,8 +109,34 @@ class AIMScoreInterface(BaseDataInterface):
                 engine='openpyxl'
             )
             df = df[[timestamps_column_name, aims_column_name]]
+            if df[aims_column_name].isna().any():
+                print(f"There are NaN values in the {aims_column_name} column. Forward filling these values.")
+                df[aims_column_name] = df[aims_column_name].ffill()
+            return df
         else:
             raise ValueError("Could not find the header row in the AIM score behavior file.")
+
+    def add_to_nwbfile(
+        self,
+        nwbfile: NWBFile,
+        metadata: Optional[dict] = dict(),
+        timestamps_column_name: str = "Time (minutes relative to injection)",
+        aims_column_name: str = "AIMS",
+        timestamp_offset: float = 0.0
+    ) -> None:
+        # Read file into DataFrame
+        df = self.get_dataframe(
+            timestamps_column_name=timestamps_column_name,
+            aims_column_name=aims_column_name
+        )
+
+        # Expand AIMS scores from minutes to seconds
+        expanded_times, expanded_values = expand_aims_to_seconds(
+            df=df,
+            timestamps_column_name=timestamps_column_name,
+            aims_column_name=aims_column_name,
+            timestamp_offset=timestamp_offset,
+        )
 
         # Create processing module and add TimeSeries
         if "behavior" not in nwbfile.processing:
@@ -118,12 +146,6 @@ class AIMScoreInterface(BaseDataInterface):
         else:
             behavior_module = nwbfile.processing["behavior"]
 
-        expanded_times, expanded_values = expand_aims_to_seconds(
-            df=df,
-            timestamps_column_name=timestamps_column_name,
-            aims_column_name=aims_column_name,
-            timestamp_offset=timestamp_offset,
-        )
         aims_ts = TimeSeries(
             name="aims",
             data=expanded_values,
