@@ -1,7 +1,20 @@
 """Primary script to run to convert sessions using the NWBConverter."""
 from pathlib import Path
+import numpy as np
 from neuroconv.utils import load_dict_from_file, dict_deep_update
 from neuroconv.utils import FilePathType, FolderPathType
+from neuroconv.datainterfaces.behavior.video.video_utils import VideoCaptureContext
+
+
+def get_video_synced_timestamps(video_path, camera_timestamps):
+    with VideoCaptureContext(file_path=str(video_path)) as video:
+        n_frames = video.frame_count
+    n_missing_frames = n_frames - len(camera_timestamps)
+    time_interval = np.mean(np.diff(camera_timestamps))
+    starting_time = camera_timestamps[0]
+    missing_timestamps = [starting_time - (i + 1) * time_interval for i in range(n_missing_frames)]
+    video_synced_timestamps = missing_timestamps[::-1] + camera_timestamps
+    return video_synced_timestamps
 
 
 def session_to_nwb(
@@ -80,9 +93,19 @@ def session_to_nwb(
     tdt_events = converter.data_interface_objects.get("FiberPhotometry").get_events()
     aim_time_offset = tdt_events.get(aim_epoc_name).get("onset")[0]
 
-    noldus_timestamps = tdt_events.get(noldus_epoc_name).get("onset")
+    camera_ttl_timestamps = tdt_events.get(noldus_epoc_name).get("onset")
     noldus_df = converter.data_interface_objects.get("NoldusInterface").get_dataframe()
-    noldus_synced_timestamps = list(noldus_timestamps[-noldus_df.shape[0]:])
+    noldus_synced_timestamps = list(camera_ttl_timestamps[-noldus_df.shape[0]:])
+
+    # Because the TDT acquisition system misses the TTL times for the first video frames,
+    # we need to manually add the first N timestamps to the camera synced timestamps list
+    # where N = n_frames - n_ttls
+    video_synced_timestamps = get_video_synced_timestamps(
+        video_path=behavioral_video_file_path,
+        camera_timestamps=list(camera_ttl_timestamps),
+    )
+    video_interface_top = converter.data_interface_objects["BehavioralVideo"]
+    video_interface_top.set_aligned_timestamps(aligned_timestamps=[video_synced_timestamps])
 
     # Conversion options
     conversion_options = dict(
