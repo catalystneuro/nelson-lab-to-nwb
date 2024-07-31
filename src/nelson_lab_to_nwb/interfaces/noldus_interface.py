@@ -43,16 +43,24 @@ class NoldusInterface(BaseDataInterface):
             verbose=verbose
         )
         self.file_path = file_path
-        header_row = find_header_row(file_path, header_names=["Trial time", "Recording time"])
+
+    def get_dataframe(
+        self,
+        variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
+        timestamps_column_name: str = "Trial time",
+    ) -> pd.DataFrame:
+        header_row = find_header_row(self.file_path, header_names=["Trial time", "Recording time"])
         if header_row is not None:
             df = pd.read_excel(
-                io=str(file_path),
+                io=str(self.file_path),
                 header=header_row,
                 engine='openpyxl'
             )
             self.df = df.drop(index=0)
         else:
             raise ValueError("Could not find the header row in the raw behavior file.")
+        self.df = self.df[variables_columns_names + [timestamps_column_name]]
+        return self.df
 
     def add_to_nwbfile(
         self,
@@ -60,15 +68,18 @@ class NoldusInterface(BaseDataInterface):
         metadata: Optional[dict] = dict(),
         variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
         timestamps_column_name: str = "Trial time",
+        timestamp_offset: float = 0.0,
         reference_timestamps: list = None,
-        timestamp_offset: float = 0.0
+        synced_timestamps: list = None,
     ) -> None:
-
-        self.df = self.df[variables_columns_names + [timestamps_column_name]]
-        timestamp_samples = self.df[timestamps_column_name].astype(float) / 0.05
-        self.df["timestamp_samples"] = timestamp_samples
-
-        if reference_timestamps is not None:
+        self.get_dataframe(
+            variables_columns_names=variables_columns_names,
+            timestamps_column_name=timestamps_column_name
+        )
+        if synced_timestamps is not None:
+            self.df["synced_timestamps"] = synced_timestamps
+        elif reference_timestamps is not None:
+            timestamp_samples = self.df[timestamps_column_name].astype(float) / 0.05
             self.df["synced_timestamps"] = [
                 reference_timestamps[int(t)]
                 if int(t) < len(reference_timestamps)

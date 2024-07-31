@@ -12,7 +12,7 @@ From a terminal (note that conda should install one in your system) you can do t
 git clone https://github.com/catalystneuro/nelson-lab-to-nwb
 cd nelson-lab-to-nwb
 conda env create --file make_env.yml
-conda activate nelson-lab-to-nwb-env
+conda activate env_nelson
 ```
 
 This creates a [conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html)

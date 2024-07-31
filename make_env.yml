@@ -1,4 +1,4 @@
-name: nelson_lab_to_nwb_env
+name: env_nelson
 channels:
   - conda-forge
   - defaults
