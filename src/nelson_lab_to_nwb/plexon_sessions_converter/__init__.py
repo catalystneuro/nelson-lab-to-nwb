@@ -1,2 +1,2 @@
 from .plexon_converter import PlexonNWBConverter
-from .plexon_convert_session import session_to_nwb
+from .convert_session import session_to_nwb

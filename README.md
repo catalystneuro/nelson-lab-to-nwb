@@ -28,3 +28,16 @@ pip install -e .
 
 Note:
 both of the methods above install the repository in [editable mode](https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs).
+
+
+## Conversion
+At each experiment's folder you will find:
+- The conversion scripts `convert_session.py`.
+- The converter code `<experiment>_converter.py`.
+- Example metadata files `metadata_example.yaml`.
+- Jupyter notebooks `example_conversino.ipynb` demonstrating the usage of the conversion scripts and basic exploratory data analysis.
+- A `README.md` file with a basic description of the data.
+
+
+## Upload to DANDI archive
+Detailed instructions on how to upload the data to the DANDI archive can be found [here](https://github.com/catalystneuro/nelson-lab-to-nwb/blob/main/dandi.md).

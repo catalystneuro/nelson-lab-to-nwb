@@ -1,2 +1,2 @@
 from .blackrock_converter import BlackrockNWBConverter
-from .blackrock_convert_session import session_to_nwb
+from .convert_session import session_to_nwb
