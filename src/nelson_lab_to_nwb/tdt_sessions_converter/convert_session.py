@@ -122,7 +122,7 @@ def session_to_nwb(
     )
 
     subject_id = metadata.get("Subject").get("subject_id")
-    start_datetime = metadata.get("NWBFile").get("session_start_time").replace(":", "").replace("-", "")[:-4]
+    start_datetime = metadata.get("NWBFile").get("session_start_time").replace(":", "").replace("-", "")[:15]
     nwbfile_path = str(output_folder / f"{subject_id}_{start_datetime}.nwb")
 
     # Run conversion
