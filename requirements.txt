@@ -9,7 +9,7 @@ PyYAML==6.0.1
 openpyxl==3.1.2
 pandas>=2.2.0
 opencv-python-headless
-neuroconv @ git+https://github.com/catalystneuro/neuroconv.git@main
+neuroconv @ git+https://github.com/catalystneuro/neuroconv.git@727228c8bd871d0ffdcca48ac76a2010f293652d
 # neuroconv>=0.5.1
 # ndx-fiber-photometry @ git+https://github.com/catalystneuro/ndx-fiber-photometry.git@main
 ndx-fiber-photometry==0.1.0
