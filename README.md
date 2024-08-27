@@ -43,6 +43,7 @@ At each experiment's folder you will find:
 To run the example notebooks, just navigate to the experiment's folder and run from the terminal:
 
 ```bash
+conda activate env_nelson
 jupyter notebook
 ```
 
