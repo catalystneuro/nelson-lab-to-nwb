@@ -13,6 +13,7 @@ git clone https://github.com/catalystneuro/nelson-lab-to-nwb
 cd nelson-lab-to-nwb
 conda env create --file make_env.yml
 conda activate env_nelson
+python -m ipykernel install --user --name env_nelson
 ```
 
 This creates a [conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html)
@@ -35,8 +36,16 @@ At each experiment's folder you will find:
 - The conversion scripts `convert_session.py`.
 - The converter code `<experiment>_converter.py`.
 - Example metadata files `metadata_example.yaml`.
-- Jupyter notebooks `example_conversino.ipynb` demonstrating the usage of the conversion scripts and basic exploratory data analysis.
+- Jupyter notebooks `example_conversion.ipynb` demonstrating the usage of the conversion scripts and basic exploratory data analysis.
 - A `README.md` file with a basic description of the data.
+
+To run the example notebooks, just navigate to the experiment's folder and run from the terminal:
+
+```bash
+jupyter notebook
+```
+
+ This will open a new tab in your browser with the Jupyter interface. From there you can open the `example_conversion.ipynb` notebook and follow along.
 
 
 ## Upload to DANDI archive

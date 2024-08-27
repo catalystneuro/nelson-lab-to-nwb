@@ -1,8 +1,9 @@
 from pathlib import Path
 import numpy as np
+from pydantic import DirectoryPath
 from packaging.version import Version
 from pynwb.ecephys import ElectricalSeries
-from neuroconv.utils import DirectoryPath, get_schema_from_hdmf_class
+from neuroconv.utils import get_schema_from_hdmf_class
 from neuroconv.tools import get_package_version
 from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
 from spikeinterface.extractors import read_intan
