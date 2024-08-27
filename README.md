@@ -39,6 +39,7 @@ At each experiment's folder you will find:
 - Jupyter notebooks `example_conversion.ipynb` demonstrating the usage of the conversion scripts and basic exploratory data analysis.
 - A `README.md` file with a basic description of the data.
 
+### With Jupyter notebooks
 To run the example notebooks, just navigate to the experiment's folder and run from the terminal:
 
 ```bash
@@ -46,6 +47,27 @@ jupyter notebook
 ```
 
  This will open a new tab in your browser with the Jupyter interface. From there you can open the `example_conversion.ipynb` notebook and follow along.
+
+### With your own Python scripts
+To convert the data with your own Python scripts, you can import the `session_to_nwb` function from `convert_session.py`. For example:
+
+```python
+from nelson_lab_to_nwb.tdt_sessions_converter import session_to_nwb
+
+nwbfile_path = session_to_nwb(
+    output_folder_path="output_tdt",
+    tdt_folder_path="/path_to/folder/",
+    noldus_file_path="/path_to/file.xlsx",
+    aim_score_file_path="/path_to/file.xlsx",
+    behavioral_video_file_path="/path_to/file.avi",
+    user_metadata_file_path="/path_to/metadata.yaml",
+    noldus_variables_columns_names=["Elongation", "Velocity", "Distance moved", "Rotation"],
+    noldus_epoc_name="Cam2",
+    aim_epoc_name="TTL1",
+    overwrite=True,
+    verbose=True,
+)
+```
 
 
 ## Upload to DANDI archive
