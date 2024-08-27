@@ -1,18 +1,19 @@
 """Primary script to run to convert sessions using the NWBConverter."""
 from pathlib import Path
+from pydantic import FilePath, DirectoryPath
+
 from neuroconv.utils import load_dict_from_file, dict_deep_update
-from neuroconv.utils import FilePathType, FolderPathType
 
 
 def session_to_nwb(
     *,
-    output_folder_path: FolderPathType,
-    blackrock_raw_file_path: FilePathType,
-    blackrock_lfp_file_path: FilePathType,
-    blackrock_sorting_file_path: FilePathType,
-    behavioral_events_file_path: FilePathType,
-    behavioral_video_file_path: FilePathType,
-    user_metadata_file_path: FilePathType,
+    output_folder_path: DirectoryPath,
+    blackrock_raw_file_path: FilePath,
+    blackrock_lfp_file_path: FilePath,
+    blackrock_sorting_file_path: FilePath,
+    behavioral_events_file_path: FilePath,
+    behavioral_video_file_path: FilePath,
+    user_metadata_file_path: FilePath,
     behavioral_events_time_offset: int = 0,
     stub_test: bool = False,
     overwrite: bool = False,
@@ -22,19 +23,19 @@ def session_to_nwb(
 
     Parameters
     ----------
-    output_folder_path : FolderPathType
+    output_folder_path : DirectoryPath
         Path to the output folder.
-    blackrock_raw_file_path : FilePathType
+    blackrock_raw_file_path : FilePath
         Path to the Blackrock raw data file (.ns6).
-    blackrock_lfp_file_path : FilePathType
+    blackrock_lfp_file_path : FilePath
         Path to the Blackrock LFP data file (.ns2).
-    blackrock_sorting_file_path : FilePathType
+    blackrock_sorting_file_path : FilePath
         Path to the Blackrock sorting data file (.nev).
-    behavioral_events_file_path : FilePathType
+    behavioral_events_file_path : FilePath
         Path to the behavioral events file (.csv).
-    behavioral_video_file_path : FilePathType
+    behavioral_video_file_path : FilePath
         Path to the behavioral video file (.mp4, .avi).
-    user_metadata_file_path : FilePathType
+    user_metadata_file_path : FilePath
         Path to the user metadata file (.yaml).
     behavioral_events_time_offset : int, optional (default 0)
         Time offset, in hours, to apply to behavioral events, by default 0.

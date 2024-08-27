@@ -2,7 +2,7 @@
 from pathlib import Path
 import numpy as np
 from neuroconv.utils import load_dict_from_file, dict_deep_update
-from neuroconv.utils import FilePathType, FolderPathType
+from pydantic import FilePath, DirectoryPath
 from neuroconv.datainterfaces.behavior.video.video_utils import VideoCaptureContext
 
 
@@ -19,12 +19,12 @@ def get_video_synced_timestamps(video_path, camera_timestamps):
 
 def session_to_nwb(
     *,
-    output_folder_path: FolderPathType,
-    tdt_folder_path: FolderPathType,
-    noldus_file_path: FilePathType,
-    aim_score_file_path: FilePathType,
-    behavioral_video_file_path: FilePathType,
-    user_metadata_file_path: FilePathType,
+    output_folder_path: DirectoryPath,
+    tdt_folder_path: DirectoryPath,
+    noldus_file_path: FilePath,
+    aim_score_file_path: FilePath,
+    behavioral_video_file_path: FilePath,
+    user_metadata_file_path: FilePath,
     noldus_variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
     noldus_epoc_name: str = "Cam2",
     aim_epoc_name: str = "TTL1",
@@ -35,17 +35,17 @@ def session_to_nwb(
 
     Parameters
     ----------
-    output_folder_path : FolderPathType
+    output_folder_path : DirectoryPath
         Path to the output folder.
-    tdt_folder_path : FolderPathType
+    tdt_folder_path : DirectoryPath
         Path to the TDT data folder.
-    noldus_file_path : FilePathType
+    noldus_file_path : FilePath
         Path to the Noldus (.xlsx) file.
-    aim_score_file_path : FilePathType
+    aim_score_file_path : FilePath
         Path to the AIMScore (.xlsx) file.
-    behavioral_video_file_path : FilePathType
+    behavioral_video_file_path : FilePath
         Path to the behavioral video file (.mp4, .avi).
-    user_metadata_file_path : FilePathType
+    user_metadata_file_path : FilePath
         Path to the user metadata file (.yaml).
     noldus_variables_columns_names : list, optional (default ["Elongation", "Velocity", "Distance moved", "Rotation"])
         Names of the columns in the Noldus file that contain the variables of interest, by default ["Elongation", "Velocity", "Distance moved", "Rotation"].

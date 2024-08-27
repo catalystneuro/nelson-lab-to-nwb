@@ -1,7 +1,7 @@
 from pynwb import NWBFile
 from ndx_events import LabeledEvents
 from neuroconv import BaseDataInterface
-from neuroconv.utils import FilePathType
+from pydantic import FilePath, DirectoryPath
 import pandas as pd
 
 
@@ -16,12 +16,12 @@ class CognitiveBehavioralInterface(BaseDataInterface):
 
     def __init__(
         self,
-        file_path: FilePathType,
+        file_path: FilePath,
         verbose: bool = False
     ):
         """
         Args:
-            file_path (FilePathType): Path to the behavior data file.
+            file_path (FilePath): Path to the behavior data file.
             verbose (bool, optional): Whether to print verbose output. Defaults to False.
         """
         super().__init__(

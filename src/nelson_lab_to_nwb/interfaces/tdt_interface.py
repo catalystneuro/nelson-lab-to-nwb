@@ -4,7 +4,7 @@ from datetime import timezone
 import tdt
 import yaml
 from neuroconv import BaseDataInterface
-from neuroconv.utils import FolderPathType, FilePathType, dict_deep_update
+from neuroconv.utils import DirectoryPath, FilePath, dict_deep_update
 from pynwb import NWBFile
 from ndx_photometry import (
     FibersTable,
@@ -22,13 +22,13 @@ class TdtFiberPhotometryInterface(BaseDataInterface):
     associated_suffixes = ("tbk", "tdx", "tev", "tin", "tnt", "tsq", "sev", "txt")
     info = "Interface for TDT Fiber Photometry data."
 
-    def __init__(self, folder_path: FolderPathType, metadata_path: Optional[FilePathType] = None, verbose: bool = False):
+    def __init__(self, folder_path: DirectoryPath, metadata_path: Optional[FilePath] = None, verbose: bool = False):
         """
         Custom data interface class for converting TDT Fiber Photometry recordings.
 
         Args:
-            folder_path (FolderPathType): Folder path containing the TDT data files.
-            metadata_path (FilePathType, optional): Path to the metadata YAML file. Defaults to None.
+            folder_path (DirectoryPath): Folder path containing the TDT data files.
+            metadata_path (FilePath, optional): Path to the metadata YAML file. Defaults to None.
             verbose (bool, optional): Whether to print verbose output. Defaults to False.
         """
         super().__init__(verbose=verbose, folder_path=folder_path)

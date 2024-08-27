@@ -1,7 +1,7 @@
 from typing import Optional, Union
 from pynwb import NWBFile, TimeSeries
 from neuroconv import BaseDataInterface
-from neuroconv.utils import FilePathType
+from pydantic import FilePath, DirectoryPath
 import pandas as pd
 import numpy as np
 
@@ -72,12 +72,12 @@ class AIMScoreInterface(BaseDataInterface):
 
     def __init__(
         self,
-        file_path: FilePathType,
+        file_path: FilePath,
         verbose: bool = False
     ):
         """
         Args:
-            file_path (FilePathType): Path to the behavior data file.
+            file_path (FilePath): Path to the behavior data file.
             reference_timestamps (Union[list[float], np.ndarray], optional): Reference timestamps for synchronization. Defaults to None.
             verbose (bool, optional): Whether to print verbose output. Defaults to False.
         """

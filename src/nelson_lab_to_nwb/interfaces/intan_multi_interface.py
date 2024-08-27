@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 from packaging.version import Version
 from pynwb.ecephys import ElectricalSeries
-from neuroconv.utils import FolderPathType, get_schema_from_hdmf_class
+from neuroconv.utils import DirectoryPath, get_schema_from_hdmf_class
 from neuroconv.tools import get_package_version
 from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
 from spikeinterface.extractors import read_intan
@@ -40,7 +40,7 @@ def get_ttl_signal(neo_reader, ttl_signal_name="DIGITAL-IN-14"):
 
 
 def make_concatenate_extractor(
-    folder_path: FolderPathType,
+    folder_path: DirectoryPath,
     stream_id: str = "0",
 ):
     list_of_files = sorted([str(f.resolve()) for f in Path(folder_path).glob("*.rhd")])
@@ -91,7 +91,7 @@ class IntanMultifilesRecordingInterface(BaseRecordingExtractorInterface):
 
     def __init__(
         self,
-        folder_path: FolderPathType,
+        folder_path: DirectoryPath,
         verbose: bool = True,
         es_key: str = "ElectricalSeries",
     ):
@@ -100,7 +100,7 @@ class IntanMultifilesRecordingInterface(BaseRecordingExtractorInterface):
 
         Parameters
         ----------
-        folder_path : FolderPathType
+        folder_path : DirectoryPath
             Path to the folder containing the rhd or rhs files.
         verbose : bool, default: True
             Verbose

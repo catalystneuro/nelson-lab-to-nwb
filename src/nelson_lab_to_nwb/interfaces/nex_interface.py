@@ -1,6 +1,6 @@
 from typing import Optional, Literal
 from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
-from neuroconv.utils import FilePathType
+from pydantic import FilePath, DirectoryPath
 from pynwb import NWBFile
 from pynwb.ogen import OptogeneticSeries
 import numpy as np
@@ -33,7 +33,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
 
     def __init__(
         self,
-        file_path: FilePathType,
+        file_path: FilePath,
         es_key: str = "ElectricalSeries",
         channels_to_remove: list = ["Laser", "AD50"],
         verbose: bool = True,

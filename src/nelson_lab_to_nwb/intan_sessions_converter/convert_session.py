@@ -1,17 +1,18 @@
 """Primary script to run to convert sessions using the NWBConverter."""
 from pathlib import Path
+from pydantic import FilePath, DirectoryPath
+
 from neuroconv.utils import load_dict_from_file, dict_deep_update
-from neuroconv.utils import FilePathType, FolderPathType
 
 
 def session_to_nwb(
     *,
-    output_folder_path: FolderPathType,
-    intan_folder_path: FilePathType,
-    aim_score_file_path: FilePathType,
-    top_behavioral_video_file_path: FilePathType,
-    side_behavioral_video_file_path: FilePathType,
-    user_metadata_file_path: FilePathType,
+    output_folder_path: DirectoryPath,
+    intan_folder_path: FilePath,
+    aim_score_file_path: FilePath,
+    top_behavioral_video_file_path: FilePath,
+    side_behavioral_video_file_path: FilePath,
+    user_metadata_file_path: FilePath,
     injection_time_in_seconds: float = 0.0,
     stub_test: bool = False,
     overwrite: bool = False,
@@ -21,17 +22,17 @@ def session_to_nwb(
 
     Parameters
     ----------
-    output_folder_path : FolderPathType
+    output_folder_path : DirectoryPath
         Path to the output folder.
-    intan_folder_path : FilePathType
+    intan_folder_path : FilePath
         Path to the Intan folder containing the .rhd data files.
-    aim_score_file_path : FilePathType
+    aim_score_file_path : FilePath
         Path to the AIM score file (.csv, .xlsx).
-    top_behavioral_video_file_path : FilePathType
+    top_behavioral_video_file_path : FilePath
         Path to the top recording behavioral video file (.mp4, .avi).
-    side_behavioral_video_file_path : FilePathType
+    side_behavioral_video_file_path : FilePath
         Path to the side recording behavioral video file (.mp4, .avi).
-    user_metadata_file_path : FilePathType
+    user_metadata_file_path : FilePath
         Path to the user metadata file (.yaml).
     injection_time_in_seconds : float, optional (default 0.0)
         Time of injection in seconds, used to synchronize AIM scores. Default 0.0.

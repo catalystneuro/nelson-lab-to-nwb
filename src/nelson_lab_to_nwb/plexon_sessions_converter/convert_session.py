@@ -2,16 +2,16 @@
 from pathlib import Path
 from typing import Optional
 from neuroconv.utils import load_dict_from_file, dict_deep_update
-from neuroconv.utils import FilePathType, FolderPathType
+from pydantic import FilePath, DirectoryPath
 
 
 def session_to_nwb(
     *,
-    output_folder_path: FolderPathType,
-    nex_file_path: FilePathType,
-    noldus_file_path: FilePathType,
-    aim_score_file_path: FilePathType,
-    metadata_file_path: FilePathType,
+    output_folder_path: DirectoryPath,
+    nex_file_path: FilePath,
+    noldus_file_path: FilePath,
+    aim_score_file_path: FilePath,
+    metadata_file_path: FilePath,
     channel_names_to_remove: list = ["Laser", "AD50"],
     noldus_start_event_name: str = "Noldus Start",
     noldus_variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
@@ -27,15 +27,15 @@ def session_to_nwb(
 
     Parameters
     ----------
-    output_folder_path : FolderPathType
+    output_folder_path : DirectoryPath
         Path to the output folder.
-    nex_file_path : FilePathType
+    nex_file_path : FilePath
         Path to the NeuroExplorer (.nex) file.
-    noldus_file_path : FilePathType
+    noldus_file_path : FilePath
         Path to the Noldus (.xlsx) file.
-    aim_score_file_path : FilePathType
+    aim_score_file_path : FilePath
         Path to the AIMScore (.xlsx) file.
-    metadata_file_path : FilePathType
+    metadata_file_path : FilePath
         Path to the metadata (.json) file.
     channel_names_to_remove : list, optional (default ["Laser", "AD50"])
         Names of the channels to remove from the NeuroExplorer file, by default ["Laser", "AD50"].
