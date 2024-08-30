@@ -8,6 +8,8 @@ The package can be installed from this GitHub repo, which has the advantage that
 
 From a terminal (note that conda should install one in your system) you can do the following:
 
+> **For Windows users** the conda create command should be run with Administrator privileges.
+
 ```
 git clone https://github.com/catalystneuro/nelson-lab-to-nwb
 cd nelson-lab-to-nwb
