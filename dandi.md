@@ -16,32 +16,42 @@ export DANDI_API_KEY=personal-key-value
 
 ## Upload data
 
-Given that you have a DANDI dataset created, you can upload data to it using the DANDI client.
+Given that you have a dandiset created, you can upload assets to it using the DANDI client.
 
-1. Download the dataset to a local directory:
+1. Download the dandiset to a local directory. For example, to download the dandiset with ID `DANDI:001130`:
 ```
-dandi download https://dandiarchive.org/dandiset/<dataset_id>/draft
+dandi download --download dandiset.yaml DANDI:001130
+```
+This command will download the dandiset metadata file `dandiset.yaml` to the current directory, without downloading the actual data files. This is useful when you only want to upload new data files to an existing dandiset.
+
+2. Change directory to the dandiset folder:
+```
+cd 001130
 ```
 
-2. Change directory to the dataset folder:
-```
-cd <dataset_id>
-```
-
-3. Organize the converted NWB files according to the DANDI dataset structure, where `<source_folder>` is the folder containing the NWB files created by your conversion script:
+3. Organize the converted NWB files according to the dandiset structure, where `<source_folder>` is the folder containing the NWB files created by your conversion script:
 ```
 dandi organize <source_folder> --media-files-mode copy --update-external-file-paths
 ```
 
-4. Run validation on the dataset:
+4. Run validation on the assets:
 ```
 dandi validate .
 ```
 
-5. Upload the dataset to the DANDI archive:
+5. Upload the assets to the DANDI archive:
 ```
 dandi upload
 ```
 
+## Additional information
+For detailed instructions on how to upload data to the DANDI archive, refer to the DANDI handbook: https://www.dandiarchive.org/handbook/13_upload/
 
-Reference: https://www.dandiarchive.org/handbook/13_upload/
+To explore all the options available in the DANDI client, you can run the commands with the `--help` flag. For example:
+```
+dandi --help
+dandi download --help
+dandi organize --help
+dandi validate --help
+dandi upload --help
+```
