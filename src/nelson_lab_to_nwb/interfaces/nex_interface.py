@@ -54,7 +54,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         # Remove extra channels: "Laser" and "AD50"
         ids_to_remove = list()
         for i in self.recording_extractor.channel_ids:
-            name = self.recording_extractor.get_channel_property(channel_id=i, key="channel_name")
+            name = self.recording_extractor.get_channel_property(channel_id=i, key="channel_names")
             if name in channels_to_remove:
                 ids_to_remove.append(i)
         self.recording_extractor = self.recording_extractor.remove_channels(remove_channel_ids=ids_to_remove)
