@@ -15,7 +15,7 @@ classifiers = [
 ]
 dependencies = [
     "neuroconv==0.6.0",
-    "spikeinterface>=0.101.0",
+    "spikeinterface==0.101.0",
     "dandi>=0.62.4",
     "dandischema>=0.10.2",
     "nwbwidgets==0.11.3",
