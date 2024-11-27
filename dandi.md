@@ -9,9 +9,16 @@
 pip install dandi
 ```
 
-3. Export your DANDI API token as an environment variable (copy it from DANDI archive website):
+3. Export your DANDI API token as an environment variable (copy it from DANDI archive website).
+
+If you're on Linux / MacOS:
 ```
 export DANDI_API_KEY=personal-key-value
+```
+
+If you're on Windows:
+```
+set DANDI_API_KEY=personal-key-value
 ```
 
 ## Upload data
