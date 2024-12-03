@@ -1,5 +1,6 @@
 NWBFile:
   session_description: Blackrock recording session
+  session_id: unique-id-123
   institution: University of California San Francisco
   lab: Nelson Lab
   experimenter:

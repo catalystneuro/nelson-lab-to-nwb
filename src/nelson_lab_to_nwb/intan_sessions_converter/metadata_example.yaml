@@ -1,5 +1,6 @@
 NWBFile:
   session_start_time: 2024-02-05T12:09:54-07:00
+  session_id: unique-id-123
   session_description: Day 1 of levodopa.
   institution: University of California San Francisco
   lab: Nelson Lab
