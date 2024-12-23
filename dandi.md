@@ -38,7 +38,7 @@ cd 001130
 
 3. Organize the converted NWB files according to the dandiset structure, where `<source_folder>` is the folder containing the NWB files created by your conversion script:
 ```
-dandi organize <source_folder> --media-files-mode copy --update-external-file-paths
+dandi organize <source_folder> --media-files-mode copy --update-external-file-paths --files-mode copy --required-field session_id
 ```
 
 4. Run validation on the assets:
