@@ -1,7 +1,7 @@
 from nelson_lab_to_nwb.interfaces import (
     NeuroExplorerRecordingInterface,
     NoldusInterface,
-    AIMScoreInterface
+    AIMScoreInterface,
 )
 from neuroconv import NWBConverter
 

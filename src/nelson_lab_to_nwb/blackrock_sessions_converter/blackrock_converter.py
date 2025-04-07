@@ -1,6 +1,10 @@
-from typing import Dict
+from typing import Dict, Optional
 import numpy as np
-from neuroconv.datainterfaces import BlackrockRecordingInterface, BlackrockSortingInterface, VideoInterface
+from neuroconv.datainterfaces import (
+    BlackrockRecordingInterface,
+    BlackrockSortingInterface,
+    VideoInterface,
+)
 from neuroconv import NWBConverter
 
 from nelson_lab_to_nwb.interfaces import CognitiveBehavioralInterface
@@ -28,7 +32,11 @@ class BlackrockNWBConverter(NWBConverter):
         set_probe(self.data_interface_objects["BlackrockRaw"].recording_extractor)
         set_probe(self.data_interface_objects["BlackrockLFP"].recording_extractor)
 
-    def temporally_align_data_interfaces(self):
+    def temporally_align_data_interfaces(
+        self,
+        metadata: Optional[dict] = None,
+        conversion_options: Optional[dict] = None,
+    ):
         # Align video timestamps
         if "BehavioralVideo" in self.data_interface_objects:
             neo_reader = self.data_interface_objects["BlackrockSorting"].sorting_extractor.neo_reader

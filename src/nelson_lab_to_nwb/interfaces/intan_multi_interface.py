@@ -5,7 +5,9 @@ from packaging.version import Version
 from pynwb.ecephys import ElectricalSeries
 from neuroconv.utils import get_schema_from_hdmf_class
 from neuroconv.tools import get_package_version
-from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
+from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import (
+    BaseRecordingExtractorInterface,
+)
 from spikeinterface.extractors import read_intan
 from spikeinterface import concatenate_recordings
 from neo.rawio import IntanRawIO
@@ -34,8 +36,7 @@ def get_ttl_signal(neo_reader, ttl_signal_name="DIGITAL-IN-14"):
             ttl_signal_stream_index = ii
 
     ttl_signal = neo_reader.get_analogsignal_chunk(
-        stream_index=ttl_signal_stream_index,
-        channel_names=[ttl_signal_name]
+        stream_index=ttl_signal_stream_index, channel_names=[ttl_signal_name]
     )
     return ttl_signal.flatten(), ttl_signal_sampling_rate
 
@@ -108,7 +109,12 @@ class IntanMultifilesRecordingInterface(BaseRecordingExtractorInterface):
         es_key : str, default: "ElectricalSeries"
         """
 
-        super().__init__(folder_path=folder_path, stream_id=self.stream_id, verbose=verbose, es_key=es_key)
+        super().__init__(
+            folder_path=folder_path,
+            stream_id=self.stream_id,
+            verbose=verbose,
+            es_key=es_key,
+        )
         electrodes_metadata = extract_electrode_metadata(recording_extractor=self.recording_extractor)
 
         group_names = electrodes_metadata["group_names"]
@@ -120,7 +126,9 @@ class IntanMultifilesRecordingInterface(BaseRecordingExtractorInterface):
         self.recording_extractor.set_property(key="group_name", ids=channel_ids, values=group_names)
         if len(unique_group_names) > 1:
             self.recording_extractor.set_property(
-                key="group_electrode_number", ids=channel_ids, values=group_electrode_numbers
+                key="group_electrode_number",
+                ids=channel_ids,
+                values=group_electrode_numbers,
             )
 
         if any(custom_names):
@@ -180,7 +188,10 @@ class IntanMultifilesRecordingInterface(BaseRecordingExtractorInterface):
         # Add electrodes and electrode groups
         ecephys_metadata.update(
             Electrodes=[
-                dict(name="group_name", description="The name of the ElectrodeGroup this electrode is a part of.")
+                dict(
+                    name="group_name",
+                    description="The name of the ElectrodeGroup this electrode is a part of.",
+                )
             ],
             ElectricalSeriesRaw=dict(name="ElectricalSeriesRaw", description="Raw acquisition traces."),
         )
@@ -189,11 +200,17 @@ class IntanMultifilesRecordingInterface(BaseRecordingExtractorInterface):
         recording_extractor_properties = self.recording_extractor.get_property_keys()
         if "group_electrode_number" in recording_extractor_properties:
             ecephys_metadata["Electrodes"].append(
-                dict(name="group_electrode_number", description="0-indexed channel within a group.")
+                dict(
+                    name="group_electrode_number",
+                    description="0-indexed channel within a group.",
+                )
             )
         if "custom_channel_name" in recording_extractor_properties:
             ecephys_metadata["Electrodes"].append(
-                dict(name="custom_channel_name", description="Custom channel name assigned in Intan.")
+                dict(
+                    name="custom_channel_name",
+                    description="Custom channel name assigned in Intan.",
+                )
             )
 
         return metadata

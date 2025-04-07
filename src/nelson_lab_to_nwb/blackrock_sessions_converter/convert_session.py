@@ -1,4 +1,5 @@
 """Primary script to run to convert sessions using the NWBConverter."""
+
 from pathlib import Path
 from pydantic import FilePath, DirectoryPath
 from typing import Optional
@@ -54,25 +55,17 @@ def session_to_nwb(
 
     # Initialize converter
     source_data = dict(
-        BlackrockRaw=dict(
-            file_path=blackrock_raw_file_path,
-            verbose=verbose
-        ),
-        BlackrockLFP=dict(
-            file_path=blackrock_lfp_file_path,
-            verbose=verbose
-        ),
+        BlackrockRaw=dict(file_path=blackrock_raw_file_path, verbose=verbose),
+        BlackrockLFP=dict(file_path=blackrock_lfp_file_path, verbose=verbose),
         BlackrockSorting=dict(
             file_path=blackrock_sorting_file_path,
             sampling_frequency=30000,
-            verbose=verbose
+            nsx_to_load=[],
+            verbose=verbose,
         ),
     )
     if behavioral_events_file_path:
-        source_data["BehavioralEvents"] = dict(
-            file_path=behavioral_events_file_path,
-            verbose=verbose
-        )
+        source_data["BehavioralEvents"] = dict(file_path=behavioral_events_file_path, verbose=verbose)
     if behavioral_video_file_path:
         source_data["BehavioralVideo"] = dict(file_paths=[behavioral_video_file_path])
 
@@ -110,7 +103,7 @@ def session_to_nwb(
         metadata=metadata,
         nwbfile_path=nwbfile_path,
         overwrite=overwrite,
-        conversion_options=conversion_options
+        conversion_options=conversion_options,
     )
 
     print(f"Conversion complete. NWB file saved to: {nwbfile_path}")

@@ -1,5 +1,7 @@
 from typing import Optional, Literal
-from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import BaseRecordingExtractorInterface
+from neuroconv.datainterfaces.ecephys.baserecordingextractorinterface import (
+    BaseRecordingExtractorInterface,
+)
 from pydantic import FilePath, DirectoryPath
 from pynwb import NWBFile
 from pynwb.ogen import OptogeneticSeries
@@ -9,7 +11,7 @@ from nelson_lab_to_nwb.utils.probe import set_probe
 
 
 def reconstruct_ttl_signal(rise_timestamps, step_duration, amplitudes, reconstruction_sampling_rate=1000):
-    total_time = rise_timestamps[-1] + step_duration + 1.
+    total_time = rise_timestamps[-1] + step_duration + 1.0
     num_samples = int(total_time * reconstruction_sampling_rate)  # Convert total_time (seconds) to samples
     time_vector = np.linspace(0, total_time, num_samples)
     ttl_signal = np.zeros(num_samples)
@@ -28,7 +30,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
     """
 
     display_name = "NeuroExplorer Recording"
-    associated_suffixes = (".nex", )
+    associated_suffixes = (".nex",)
     info = "Interface for NeuroExplorer recording data."
 
     def __init__(
@@ -38,7 +40,9 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         channels_to_remove: list = ["Laser", "AD50"],
         verbose: bool = True,
     ):
-        from spikeinterface.extractors.neoextractors.neuroexplorer import NeuroExplorerRecordingExtractor
+        from spikeinterface.extractors.neoextractors.neuroexplorer import (
+            NeuroExplorerRecordingExtractor,
+        )
         from spikeinterface.core import aggregate_channels
 
         self.Extractor = NeuroExplorerRecordingExtractor
@@ -85,7 +89,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         include_units: bool = True,
         units_suffix_ignore: list = ["_wf", "_template"],
         ogen_event_name: str = "Laser",
-        ogen_ttl_samplig_rate: float = 40000.,
+        ogen_ttl_samplig_rate: float = 40000.0,
         ogen_amplitudes_array: list = [],
     ) -> None:
         super().add_to_nwbfile(
@@ -103,7 +107,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         # Units
         if include_units:
             units_data = dict()
-            spike_channels = self.recording_header['spike_channels']
+            spike_channels = self.recording_header["spike_channels"]
             spike_channels_ind_dict = {sc[0]: ii for ii, sc in enumerate(spike_channels)}
             for ii, sc in enumerate(spike_channels):
                 if not any([suffix in sc[0] for suffix in units_suffix_ignore]):
@@ -113,7 +117,9 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
                     )
                     if sc[0] + "_template" in spike_channels_ind_dict:
                         sc_ind = spike_channels_ind_dict[sc[0] + "_template"]
-                        units_data["waveform_mean"] = np.squeeze(self.neo_rec0.get_spike_raw_waveforms(spike_channel_index=sc_ind))
+                        units_data["waveform_mean"] = np.squeeze(
+                            self.neo_rec0.get_spike_raw_waveforms(spike_channel_index=sc_ind)
+                        )
                     nwbfile.add_unit(**units_data)
 
         # Optogenetic stimulus
@@ -131,9 +137,11 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             site_metadata = ogen_metadata.get("StimulusSite", dict())
             site_metadata["device"] = device
             ogen_site = nwbfile.create_ogen_site(**site_metadata)
-            ogen_timestamps = self.neo_rec0.get_event_timestamps(event_channel_index=ogen_event_id)[0] / ogen_ttl_samplig_rate
+            ogen_timestamps = (
+                self.neo_rec0.get_event_timestamps(event_channel_index=ogen_event_id)[0] / ogen_ttl_samplig_rate
+            )
             if not ogen_amplitudes_array:
-                ogen_amplitudes_array = np.array([0.5] * 1000 + [1.] * 1000 + [2.] * 1000 + [4.] * 1000) * 0.001
+                ogen_amplitudes_array = np.array([0.5] * 1000 + [1.0] * 1000 + [2.0] * 1000 + [4.0] * 1000) * 0.001
             ttl_times, ttl_signal = reconstruct_ttl_signal(
                 rise_timestamps=ogen_timestamps,
                 step_duration=0.15,
