@@ -1,0 +1,19 @@
+NWBFile:
+  session_description: Blackrock recording session
+  session_id: unique-id-123
+  institution: University of California San Francisco
+  lab: Nelson Lab
+  experimenter:
+    - Xiaowen, Zhuang
+Subject:
+  subject_id: subid012345
+  genotype: not defined
+  description: not defined
+  species: Mus musculus
+  date_of_birth: 2023-03-17T00:00:00
+  sex: F
+Ecephys:
+  ElectricalSeries:
+    description: |
+      The recordings are separated into three segments: the first segment is the baseline recording,
+      the second segment is the after treatment recording, and the third segment is the opto-tagging recording.

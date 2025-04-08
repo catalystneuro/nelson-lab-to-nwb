@@ -55,12 +55,16 @@ def session_to_nwb(
 
     # Initialize converter
     source_data = dict(
-        BlackrockRaw=dict(file_path=blackrock_raw_file_path, verbose=verbose),
-        BlackrockLFP=dict(file_path=blackrock_lfp_file_path, verbose=verbose),
+        BlackrockRaw=dict(
+            file_path=blackrock_raw_file_path,
+            verbose=verbose,
+        ),
+        BlackrockLFP=dict(
+            file_path=blackrock_lfp_file_path,
+            verbose=verbose,
+        ),
         BlackrockSorting=dict(
             file_path=blackrock_sorting_file_path,
-            sampling_frequency=30000,
-            nsx_to_load=[],
             verbose=verbose,
         ),
     )
