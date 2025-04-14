@@ -65,6 +65,8 @@ def session_to_nwb(
         ),
         BlackrockSorting=dict(
             file_path=blackrock_sorting_file_path,
+            sampling_frequency=30_000.0,
+            nsx_to_load=[],
             verbose=verbose,
         ),
     )
@@ -99,7 +101,7 @@ def session_to_nwb(
         )
 
     subject_id = metadata.get("Subject").get("subject_id")
-    start_datetime = metadata.get("NWBFile").get("session_start_time").replace(":", "").replace("-", "")[:-4]
+    start_datetime = metadata.get("NWBFile").get("session_start_time").replace(":", "").replace("-", "").split(".")[0]
     nwbfile_path = str(output_folder / f"{subject_id}_{start_datetime}.nwb")
 
     # Run conversion

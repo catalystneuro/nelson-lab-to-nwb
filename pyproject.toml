@@ -14,9 +14,11 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "neuroconv",
-    "spikeinterface",
-    "neo",
+    # "neuroconv==0.7.2",
+    # "spikeinterface==0.102.2",
+    "neuroconv @ git+https://github.com/catalystneuro/neuroconv.git@blackrock-nev",
+    "spikeinterface @ git+https://github.com/luiztauffer/spikeinterface.git@blackrock-nev",
+    "neo @ git+https://github.com/NeuralEnsemble/python-neo.git@fc51e66e9a67dc740d34389ded5688d9fb60d0d6",
     "dandi>=0.67.3",
     "dandischema>=0.10.2",
     "nwbwidgets==0.11.3",

@@ -1,5 +1,6 @@
 from typing import Dict, Optional
 import numpy as np
+from datetime import datetime
 from neuroconv.datainterfaces import (
     BlackrockRecordingInterface,
     BlackrockSortingInterface,
@@ -34,7 +35,7 @@ class BlackrockNWBConverter(NWBConverter):
 
     def temporally_align_data_interfaces(
         self,
-        metadata: Optional[dict] = None,
+        metadata: dict,
         conversion_options: Optional[dict] = None,
     ):
         # Align video timestamps
@@ -53,3 +54,19 @@ class BlackrockNWBConverter(NWBConverter):
             video_interface = self.data_interface_objects["BehavioralVideo"]
             print(f"Setting aligned timestamps for video {video_interface.metadata_key_name}.")
             video_interface.set_aligned_timestamps(aligned_timestamps=[ttl_times_filtered])
+
+        # Align Ecephys interfaces
+        nwbfile_session_start_time = datetime.fromisoformat(metadata["NWBFile"].get("session_start_time"))
+        ecephys_interfaces = [
+            "BlackrockRaw",
+            "BlackrockLFP",
+            "BlackrockSorting",
+        ]
+        for interface_name in ecephys_interfaces:
+            if interface_name in self.data_interface_objects:
+                ecephys_interface = self.data_interface_objects[interface_name]
+                ecephys_interface_metadata = ecephys_interface.get_metadata()
+                ecephys_interface_session_start_time = datetime.fromisoformat(ecephys_interface_metadata["NWBFile"].get("session_start_time"))
+                time_delta = (ecephys_interface_session_start_time - nwbfile_session_start_time).total_seconds()
+                print(f"Setting aligned timestamps for {interface_name}")
+                ecephys_interface.set_aligned_starting_time(aligned_starting_time=time_delta)
