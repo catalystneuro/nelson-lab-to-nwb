@@ -66,7 +66,8 @@ class BlackrockNWBConverter(NWBConverter):
             if interface_name in self.data_interface_objects:
                 ecephys_interface = self.data_interface_objects[interface_name]
                 ecephys_interface_metadata = ecephys_interface.get_metadata()
-                ecephys_interface_session_start_time = datetime.fromisoformat(ecephys_interface_metadata["NWBFile"].get("session_start_time"))
-                time_delta = (ecephys_interface_session_start_time - nwbfile_session_start_time).total_seconds()
-                print(f"Setting aligned timestamps for {interface_name}")
-                ecephys_interface.set_aligned_starting_time(aligned_starting_time=time_delta)
+                if "session_start_time" in ecephys_interface_metadata["NWBFile"]:
+                    ecephys_interface_session_start_time = datetime.fromisoformat(ecephys_interface_metadata["NWBFile"].get("session_start_time"))
+                    time_delta = (ecephys_interface_session_start_time - nwbfile_session_start_time).total_seconds()
+                    print(f"Setting aligned timestamps for {interface_name}")
+                    ecephys_interface.set_aligned_starting_time(aligned_starting_time=time_delta)
