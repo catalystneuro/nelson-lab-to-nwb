@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from pydantic import FilePath, DirectoryPath
-from typing import Optional
+from typing import Optional, Literal
 from neuroconv.utils import load_dict_from_file, dict_deep_update
 
 
@@ -13,6 +13,7 @@ def session_to_nwb(
     blackrock_lfp_file_path: FilePath,
     blackrock_sorting_file_path: FilePath,
     user_metadata_file_path: FilePath,
+    probe_type: Literal["type_1", "type_2"] = "type_1",
     behavioral_events_file_path: Optional[FilePath] = None,
     behavioral_video_file_path: Optional[FilePath] = None,
     behavioral_events_time_offset: int = 0,
@@ -38,6 +39,8 @@ def session_to_nwb(
         Path to the behavioral video file (.mp4, .avi).
     user_metadata_file_path : FilePath
         Path to the user metadata file (.yaml).
+    probe_type : Literal["type_1", "type_2"], optional (default "type_1")
+        Type of probe used for the recording, by default "type_1".
     behavioral_events_time_offset : int, optional (default 0)
         Time offset, in hours, to apply to behavioral events, by default 0.
     stub_test : bool, optional (default False)
@@ -75,7 +78,11 @@ def session_to_nwb(
     if behavioral_video_file_path:
         source_data["BehavioralVideo"] = dict(file_paths=[behavioral_video_file_path])
 
-    converter = BlackrockNWBConverter(source_data=source_data, verbose=verbose)
+    converter = BlackrockNWBConverter(
+        source_data=source_data,
+        probe_type=probe_type,
+        verbose=verbose,
+    )
 
     # Automatically fetch metadata from files, then update it with user-defined metadata
     source_metadata = converter.get_metadata()

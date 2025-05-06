@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Literal
 import numpy as np
 from datetime import datetime
 from neuroconv.datainterfaces import (
@@ -26,12 +26,23 @@ class BlackrockNWBConverter(NWBConverter):
         BehavioralVideo=VideoInterface,
     )
 
-    def __init__(self, source_data: Dict[str, dict], verbose: bool = True):
+    def __init__(
+        self,
+        source_data: Dict[str, dict],
+        probe_type: Literal["type_1", "type_2"] = "type_1",
+        verbose: bool = True,
+    ):
         super().__init__(source_data=source_data, verbose=verbose)
 
         # Add probe information: https://probeinterface.readthedocs.io/en/main/index.html
-        set_probe(self.data_interface_objects["BlackrockRaw"].recording_extractor)
-        set_probe(self.data_interface_objects["BlackrockLFP"].recording_extractor)
+        set_probe(
+            extractor=self.data_interface_objects["BlackrockRaw"].recording_extractor,
+            probe_type=probe_type,
+        )
+        set_probe(
+            extractor=self.data_interface_objects["BlackrockLFP"].recording_extractor,
+            probe_type=probe_type,
+        )
 
     def temporally_align_data_interfaces(
         self,
