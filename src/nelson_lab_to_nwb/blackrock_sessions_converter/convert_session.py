@@ -8,11 +8,11 @@ from neuroconv.utils import load_dict_from_file, dict_deep_update
 
 def session_to_nwb(
     *,
-    output_folder_path: DirectoryPath,
-    blackrock_raw_file_path: FilePath,
-    blackrock_lfp_file_path: FilePath,
-    blackrock_sorting_file_path: FilePath,
     user_metadata_file_path: FilePath,
+    output_folder_path: DirectoryPath,
+    blackrock_raw_file_path: Optional[FilePath] = None,
+    blackrock_lfp_file_path: Optional[FilePath] = None,
+    blackrock_sorting_file_path: Optional[FilePath] = None,
     probe_type: Literal["type_1", "type_2"] = "type_1",
     behavioral_events_file_path: Optional[FilePath] = None,
     behavioral_video_file_path: Optional[FilePath] = None,
@@ -57,24 +57,29 @@ def session_to_nwb(
     output_folder.mkdir(exist_ok=True)
 
     # Initialize converter
-    source_data = dict(
-        BlackrockRaw=dict(
+    source_data = dict()
+    if blackrock_raw_file_path:
+        source_data["BlackrockRaw"] = dict(
             file_path=blackrock_raw_file_path,
             verbose=verbose,
-        ),
-        BlackrockLFP=dict(
+        )
+    if blackrock_lfp_file_path:
+        source_data["BlackrockLFP"] = dict(
             file_path=blackrock_lfp_file_path,
             verbose=verbose,
-        ),
-        BlackrockSorting=dict(
+        )
+    if blackrock_sorting_file_path:
+        source_data["BlackrockSorting"] = dict(
             file_path=blackrock_sorting_file_path,
             sampling_frequency=30_000.0,
             nsx_to_load=[],
             verbose=verbose,
-        ),
-    )
+        )
     if behavioral_events_file_path:
-        source_data["BehavioralEvents"] = dict(file_path=behavioral_events_file_path, verbose=verbose)
+        source_data["BehavioralEvents"] = dict(
+            file_path=behavioral_events_file_path,
+            verbose=verbose
+        )
     if behavioral_video_file_path:
         source_data["BehavioralVideo"] = dict(file_paths=[behavioral_video_file_path])
 
@@ -91,15 +96,11 @@ def session_to_nwb(
     metadata = dict_deep_update(source_metadata, user_metadata)
 
     # Conversion options
-    conversion_options = dict(
-        BlackrockRaw=dict(
-            stub_test=stub_test,
-        ),
-        BlackrockLFP=dict(
-            write_as="lfp",
-            stub_test=stub_test,
-        ),
-    )
+    conversion_options = dict()
+    if blackrock_raw_file_path:
+        conversion_options["BlackrockRaw"] = dict(stub_test=stub_test)
+    if blackrock_lfp_file_path:
+        conversion_options["BlackrockLFP"] = dict(write_as="lfp", stub_test=stub_test)
     if behavioral_events_file_path:
         conversion_options["BehavioralEvents"] = dict(
             events_column_name="Event Name",

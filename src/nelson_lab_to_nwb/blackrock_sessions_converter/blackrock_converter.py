@@ -35,14 +35,16 @@ class BlackrockNWBConverter(NWBConverter):
         super().__init__(source_data=source_data, verbose=verbose)
 
         # Add probe information: https://probeinterface.readthedocs.io/en/main/index.html
-        set_probe(
-            extractor=self.data_interface_objects["BlackrockRaw"].recording_extractor,
-            probe_type=probe_type,
-        )
-        set_probe(
-            extractor=self.data_interface_objects["BlackrockLFP"].recording_extractor,
-            probe_type=probe_type,
-        )
+        if "BlackrockRaw" in self.data_interface_objects:
+            set_probe(
+                extractor=self.data_interface_objects["BlackrockRaw"].recording_extractor,
+                probe_type=probe_type,
+            )
+        if "BlackrockLFP" in self.data_interface_objects:
+            set_probe(
+                extractor=self.data_interface_objects["BlackrockLFP"].recording_extractor,
+                probe_type=probe_type,
+            )
 
     def temporally_align_data_interfaces(
         self,
