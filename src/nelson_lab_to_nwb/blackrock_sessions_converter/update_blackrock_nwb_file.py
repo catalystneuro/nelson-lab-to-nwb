@@ -47,6 +47,15 @@ def update_nwb_file(
             # this is a temporary hack to get around the fact that nwbfile.units is a special attribute of NWBFile
             nwbfile.fields["units"] = None
 
+        # Calculate time offset
+        session_start_time = nwbfile.session_start_time
+        session_start_time = session_start_time.replace(tzinfo=None)
+        nev_start_time = neo_reader._BlackrockRawIO__nev_params("rec_datetime")
+        if nev_start_time:
+            time_offset = (nev_start_time - session_start_time).total_seconds()
+        else:
+            time_offset = 0.0
+
         # Stores unsorted spike events
         spike_channels = neo_reader.header["spike_channels"]
         for ind, spk_ch in enumerate(spike_channels):
@@ -59,11 +68,13 @@ def update_nwb_file(
             wf_unit = spk_ch["wf_units"]
             conversion_scale = conversion_scale_dict.get(wf_unit, 1.)
 
+            timestamps = neo_reader.get_spike_timestamps(spike_channel_index=ind) / 30_000. + time_offset
+
             spike_events = SpikeEventSeries(
                 name=f"SpikeEvents_Electrode_{el_ind}",
                 description="Events detected with threshold crossing, manually set for each electrode.",
                 data=neo_reader.get_spike_raw_waveforms(spike_channel_index=ind),
-                timestamps=neo_reader.get_spike_timestamps(spike_channel_index=ind),
+                timestamps=timestamps,
                 electrodes=el_region,
                 conversion=spk_ch["wf_gain"] * conversion_scale,
             )
