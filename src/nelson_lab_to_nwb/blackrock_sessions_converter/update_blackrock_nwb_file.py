@@ -61,7 +61,7 @@ def update_nwb_file(
 
             spike_events = SpikeEventSeries(
                 name=f"SpikeEvents_Electrode_{el_ind}",
-                # description="events detected with 100uV threshold",
+                description="Events detected with threshold crossing, manually set for each electrode.",
                 data=neo_reader.get_spike_raw_waveforms(spike_channel_index=ind),
                 timestamps=neo_reader.get_spike_timestamps(spike_channel_index=ind),
                 electrodes=el_region,
