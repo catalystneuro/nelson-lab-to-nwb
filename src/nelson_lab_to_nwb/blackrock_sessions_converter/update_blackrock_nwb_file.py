@@ -48,25 +48,29 @@ def update_nwb_file(
             nwbfile.fields["units"] = None
 
         # Stores unsorted spike events
-        df = nwbfile.electrodes.to_dataframe()
-        for el_id in list(df.index):
+        spike_channels = neo_reader.header["spike_channels"]
+        for ind, spk_ch in enumerate(spike_channels):
+            name = spk_ch["name"]
+            el_ind = int(name.split("ch")[-1].split("#")[0]) - 1
             el_region = nwbfile.create_electrode_table_region(
-                region=[el_id],
-                description=f"electrode_{el_id}",
+                region=[el_ind],
+                description=f"electrode_{el_ind}",
             )
-            wf_unit = neo_reader.header["spike_channels"][el_id]["wf_units"]
+            wf_unit = spk_ch["wf_units"]
             conversion_scale = conversion_scale_dict.get(wf_unit, 1.)
 
             spike_events = SpikeEventSeries(
-                name=f"SpikeEvents_Electrode_{el_id}",
+                name=f"SpikeEvents_Electrode_{el_ind}",
                 # description="events detected with 100uV threshold",
-                data=neo_reader.get_spike_raw_waveforms(spike_channel_index=el_id),
-                timestamps=neo_reader.get_spike_timestamps(spike_channel_index=el_id),
+                data=neo_reader.get_spike_raw_waveforms(spike_channel_index=ind),
+                timestamps=neo_reader.get_spike_timestamps(spike_channel_index=ind),
                 electrodes=el_region,
-                conversion=neo_reader.header["spike_channels"][el_id]["wf_gain"] * conversion_scale,
+                conversion=spk_ch["wf_gain"] * conversion_scale,
             )
             nwbfile.add_acquisition(spike_events)
 
         # Write a new file that contains everything *except* Units
         with NWBHDF5IO(out_file_path, mode="w") as out_io:
             out_io.export(src_io=in_io, nwbfile=nwbfile)
+
+        print(f"Updated NWB file saved to {out_file_path}.")
