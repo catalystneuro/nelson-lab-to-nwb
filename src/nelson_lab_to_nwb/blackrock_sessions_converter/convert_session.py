@@ -3,7 +3,7 @@
 from pathlib import Path
 from pydantic import FilePath, DirectoryPath
 from typing import Optional, Literal
-from neuroconv.utils import load_dict_from_file, dict_deep_update
+from neuroconv.utils import load_dict_from_file
 
 
 def session_to_nwb(
@@ -83,17 +83,14 @@ def session_to_nwb(
     if behavioral_video_file_path:
         source_data["BehavioralVideo"] = dict(file_paths=[behavioral_video_file_path])
 
+    user_metadata = load_dict_from_file(file_path=user_metadata_file_path)
     converter = BlackrockNWBConverter(
         source_data=source_data,
         probe_type=probe_type,
+        user_metadata=user_metadata,
         verbose=verbose,
     )
-
-    # Automatically fetch metadata from files, then update it with user-defined metadata
-    source_metadata = converter.get_metadata()
-    user_metadata_file = user_metadata_file_path
-    user_metadata = load_dict_from_file(file_path=user_metadata_file)
-    metadata = dict_deep_update(source_metadata, user_metadata)
+    metadata = converter.get_metadata()
 
     # Conversion options
     conversion_options = dict()
