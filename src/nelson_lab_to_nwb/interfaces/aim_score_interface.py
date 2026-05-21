@@ -10,7 +10,7 @@ def find_header_row(file_path, header_names: list) -> Optional[int]:
     """
     Find the header row in an Excel file containing specific keywords.
     """
-    with pd.ExcelFile(file_path, engine='openpyxl') as xls:
+    with pd.ExcelFile(file_path, engine="openpyxl") as xls:
         # Loop through each row in the first sheet
         for sheet_name in xls.sheet_names:
             sheet = xls.parse(sheet_name=sheet_name, header=None)
@@ -26,7 +26,7 @@ def expand_aims_to_seconds(
     df: pd.DataFrame,
     timestamps_column_name: str,
     aims_column_name: str,
-    timestamp_offset: float = 0.0
+    timestamp_offset: float = 0.0,
 ):
     """
     Expand the AIMS score data to seconds.
@@ -70,27 +70,20 @@ class AIMScoreInterface(BaseDataInterface):
     associated_suffixes = ("csv", "xlsx")
     info = "Interface for AIM Score behavioral data."
 
-    def __init__(
-        self,
-        file_path: FilePath,
-        verbose: bool = False
-    ):
+    def __init__(self, file_path: FilePath, verbose: bool = False):
         """
         Args:
             file_path (FilePath): Path to the behavior data file.
             reference_timestamps (Union[list[float], np.ndarray], optional): Reference timestamps for synchronization. Defaults to None.
             verbose (bool, optional): Whether to print verbose output. Defaults to False.
         """
-        super().__init__(
-            file_path=file_path,
-            verbose=verbose
-        )
+        super().__init__(file_path=file_path, verbose=verbose)
         self.file_path = file_path
 
     def get_dataframe(
         self,
         timestamps_column_name: str = "Time (minutes relative to injection)",
-        aims_column_name: str = "AIMS"
+        aims_column_name: str = "AIMS",
     ) -> pd.DataFrame:
         """
         Read the AIM score behavior data file into a DataFrame.
@@ -100,14 +93,10 @@ class AIMScoreInterface(BaseDataInterface):
         """
         header_row = find_header_row(
             file_path=self.file_path,
-            header_names=[timestamps_column_name, aims_column_name]
+            header_names=[timestamps_column_name, aims_column_name],
         )
         if header_row is not None:
-            df = pd.read_excel(
-                io=str(self.file_path),
-                header=header_row,
-                engine='openpyxl'
-            )
+            df = pd.read_excel(io=str(self.file_path), header=header_row, engine="openpyxl")
             df = df[[timestamps_column_name, aims_column_name]]
             if df[aims_column_name].isna().any():
                 print(f"There are NaN values in the {aims_column_name} column. Forward filling these values.")
@@ -122,12 +111,12 @@ class AIMScoreInterface(BaseDataInterface):
         metadata: Optional[dict] = dict(),
         timestamps_column_name: str = "Time (minutes relative to injection)",
         aims_column_name: str = "AIMS",
-        timestamp_offset: float = 0.0
+        timestamp_offset: float = 0.0,
     ) -> None:
         # Read file into DataFrame
         df = self.get_dataframe(
             timestamps_column_name=timestamps_column_name,
-            aims_column_name=aims_column_name
+            aims_column_name=aims_column_name,
         )
 
         # Expand AIMS scores from minutes to seconds
@@ -140,9 +129,7 @@ class AIMScoreInterface(BaseDataInterface):
 
         # Create processing module and add TimeSeries
         if "behavior" not in nwbfile.processing:
-            behavior_module = nwbfile.create_processing_module(
-                name="behavior", description="Processed behavioral data"
-            )
+            behavior_module = nwbfile.create_processing_module(name="behavior", description="Processed behavioral data")
         else:
             behavior_module = nwbfile.processing["behavior"]
 

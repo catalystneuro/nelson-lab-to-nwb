@@ -1,17 +1,19 @@
 """Primary script to run to convert sessions using the NWBConverter."""
+
 from pathlib import Path
 from pydantic import FilePath, DirectoryPath
-from typing import Optional
-from neuroconv.utils import load_dict_from_file, dict_deep_update
+from typing import Optional, Literal
+from neuroconv.utils import load_dict_from_file
 
 
 def session_to_nwb(
     *,
-    output_folder_path: DirectoryPath,
-    blackrock_raw_file_path: FilePath,
-    blackrock_lfp_file_path: FilePath,
-    blackrock_sorting_file_path: FilePath,
     user_metadata_file_path: FilePath,
+    output_folder_path: DirectoryPath,
+    blackrock_raw_file_path: Optional[FilePath] = None,
+    blackrock_lfp_file_path: Optional[FilePath] = None,
+    blackrock_sorting_file_path: Optional[FilePath] = None,
+    probe_type: Literal["type_1", "type_2"] = "type_1",
     behavioral_events_file_path: Optional[FilePath] = None,
     behavioral_video_file_path: Optional[FilePath] = None,
     behavioral_events_time_offset: int = 0,
@@ -37,6 +39,8 @@ def session_to_nwb(
         Path to the behavioral video file (.mp4, .avi).
     user_metadata_file_path : FilePath
         Path to the user metadata file (.yaml).
+    probe_type : Literal["type_1", "type_2"], optional (default "type_1")
+        Type of probe used for the recording, by default "type_1".
     behavioral_events_time_offset : int, optional (default 0)
         Time offset, in hours, to apply to behavioral events, by default 0.
     stub_test : bool, optional (default False)
@@ -53,21 +57,24 @@ def session_to_nwb(
     output_folder.mkdir(exist_ok=True)
 
     # Initialize converter
-    source_data = dict(
-        BlackrockRaw=dict(
+    source_data = dict()
+    if blackrock_raw_file_path:
+        source_data["BlackrockRaw"] = dict(
             file_path=blackrock_raw_file_path,
-            verbose=verbose
-        ),
-        BlackrockLFP=dict(
+            verbose=verbose,
+        )
+    if blackrock_lfp_file_path:
+        source_data["BlackrockLFP"] = dict(
             file_path=blackrock_lfp_file_path,
-            verbose=verbose
-        ),
-        BlackrockSorting=dict(
+            verbose=verbose,
+        )
+    if blackrock_sorting_file_path:
+        source_data["BlackrockSorting"] = dict(
             file_path=blackrock_sorting_file_path,
-            sampling_frequency=30000,
-            verbose=verbose
-        ),
-    )
+            sampling_frequency=30_000.0,
+            nsx_to_load=[],
+            verbose=verbose,
+        )
     if behavioral_events_file_path:
         source_data["BehavioralEvents"] = dict(
             file_path=behavioral_events_file_path,
@@ -76,24 +83,21 @@ def session_to_nwb(
     if behavioral_video_file_path:
         source_data["BehavioralVideo"] = dict(file_paths=[behavioral_video_file_path])
 
-    converter = BlackrockNWBConverter(source_data=source_data, verbose=verbose)
-
-    # Automatically fetch metadata from files, then update it with user-defined metadata
-    source_metadata = converter.get_metadata()
-    user_metadata_file = user_metadata_file_path
-    user_metadata = load_dict_from_file(file_path=user_metadata_file)
-    metadata = dict_deep_update(source_metadata, user_metadata)
+    user_metadata = load_dict_from_file(file_path=user_metadata_file_path)
+    converter = BlackrockNWBConverter(
+        source_data=source_data,
+        probe_type=probe_type,
+        user_metadata=user_metadata,
+        verbose=verbose,
+    )
+    metadata = converter.get_metadata()
 
     # Conversion options
-    conversion_options = dict(
-        BlackrockRaw=dict(
-            stub_test=stub_test,
-        ),
-        BlackrockLFP=dict(
-            write_as="lfp",
-            stub_test=stub_test,
-        ),
-    )
+    conversion_options = dict()
+    if blackrock_raw_file_path:
+        conversion_options["BlackrockRaw"] = dict(stub_test=stub_test)
+    if blackrock_lfp_file_path:
+        conversion_options["BlackrockLFP"] = dict(write_as="lfp", stub_test=stub_test)
     if behavioral_events_file_path:
         conversion_options["BehavioralEvents"] = dict(
             events_column_name="Event Name",
@@ -102,7 +106,7 @@ def session_to_nwb(
         )
 
     subject_id = metadata.get("Subject").get("subject_id")
-    start_datetime = metadata.get("NWBFile").get("session_start_time").replace(":", "").replace("-", "")[:-4]
+    start_datetime = metadata.get("NWBFile").get("session_start_time").replace(":", "").replace("-", "").split(".")[0]
     nwbfile_path = str(output_folder / f"{subject_id}_{start_datetime}.nwb")
 
     # Run conversion
@@ -110,7 +114,7 @@ def session_to_nwb(
         metadata=metadata,
         nwbfile_path=nwbfile_path,
         overwrite=overwrite,
-        conversion_options=conversion_options
+        conversion_options=conversion_options,
     )
 
     print(f"Conversion complete. NWB file saved to: {nwbfile_path}")

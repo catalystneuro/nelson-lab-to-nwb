@@ -1,4 +1,5 @@
 """Primary script to run to convert sessions using the NWBConverter."""
+
 from pathlib import Path
 from pydantic import FilePath, DirectoryPath
 
@@ -56,19 +57,16 @@ def session_to_nwb(
             verbose=verbose,
             es_key="ElectricalSeries",
         ),
-        AIMScore=dict(
-            file_path=aim_score_file_path,
-            verbose=verbose
-        ),
+        AIMScore=dict(file_path=aim_score_file_path, verbose=verbose),
         BehavioralVideoTop=dict(
             file_paths=[top_behavioral_video_file_path],
             metadata_key_name="VideoTop",
-            verbose=verbose
+            verbose=verbose,
         ),
         BehavioralVideoSide=dict(
             file_paths=[side_behavioral_video_file_path],
             metadata_key_name="VideoSide",
-            verbose=verbose
+            verbose=verbose,
         ),
     )
 
@@ -98,7 +96,7 @@ def session_to_nwb(
         metadata=metadata,
         nwbfile_path=nwbfile_path,
         overwrite=overwrite,
-        conversion_options=conversion_options
+        conversion_options=conversion_options,
     )
 
     print(f"Conversion complete. NWB file saved to: {nwbfile_path}")

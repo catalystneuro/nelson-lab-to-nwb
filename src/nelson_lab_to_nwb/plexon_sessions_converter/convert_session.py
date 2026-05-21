@@ -1,4 +1,5 @@
 """Primary script to run to convert sessions using the NWBConverter."""
+
 from pathlib import Path
 from typing import Optional
 from neuroconv.utils import load_dict_from_file, dict_deep_update
@@ -14,7 +15,12 @@ def session_to_nwb(
     metadata_file_path: FilePath,
     channel_names_to_remove: list = ["Laser", "AD50"],
     noldus_start_event_name: str = "Noldus Start",
-    noldus_variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
+    noldus_variables_columns_names: list = [
+        "Elongation",
+        "Velocity",
+        "Distance moved",
+        "Rotation",
+    ],
     aim_start_event_name: str = "Keyboard1",
     include_units: bool = True,
     ogen_event_name: str = "Laser",
@@ -68,16 +74,9 @@ def session_to_nwb(
 
     # Initialize converter
     source_data = dict(
-        NeuroExplorerRecordingInterface=dict(
-            file_path=nex_file_path,
-            channels_to_remove=channel_names_to_remove
-        ),
-        NoldusInterface=dict(
-            file_path=noldus_file_path
-        ),
-        AIMScore=dict(
-            file_path=aim_score_file_path
-        )
+        NeuroExplorerRecordingInterface=dict(file_path=nex_file_path, channels_to_remove=channel_names_to_remove),
+        NoldusInterface=dict(file_path=noldus_file_path),
+        AIMScore=dict(file_path=aim_score_file_path),
     )
     converter = PlexonNWBConverter(source_data=source_data, verbose=verbose)
 
@@ -103,10 +102,14 @@ def session_to_nwb(
             )
             print(f"Found event '{aim_start_event_name}' at time {aim_time_offset}.")
     if noldus_time_offset is None:
-        Warning(f"Could not find event '{noldus_start_event_name}' in the NeuroExplorer file. Setting to noldus_time_offset=0.")
+        Warning(
+            f"Could not find event '{noldus_start_event_name}' in the NeuroExplorer file. Setting to noldus_time_offset=0."
+        )
         noldus_time_offset = 0.0
     if aim_time_offset is None:
-        Warning(f"Could not find event '{aim_start_event_name}' in the NeuroExplorer file. Setting to aim_time_offset=0.")
+        Warning(
+            f"Could not find event '{aim_start_event_name}' in the NeuroExplorer file. Setting to aim_time_offset=0."
+        )
         aim_time_offset = 0.0
 
     # Run conversion
@@ -117,19 +120,19 @@ def session_to_nwb(
             include_units=include_units,
             units_suffix_ignore=["_wf", "_template"],
             ogen_event_name=ogen_event_name,
-            ogen_ttl_samplig_rate=40000.,
+            ogen_ttl_samplig_rate=40000.0,
             ogen_amplitudes_array=ogen_amplitudes_array,
         ),
         NoldusInterface=dict(
             variables_columns_names=noldus_variables_columns_names,
             timestamps_column_name="Trial time",
-            timestamp_offset=noldus_time_offset
+            timestamp_offset=noldus_time_offset,
         ),
         AIMScore=dict(
             timestamps_column_name="Time (minutes relative to injection)",
             aims_column_name="AIMS",
-            timestamp_offset=aim_time_offset
-        )
+            timestamp_offset=aim_time_offset,
+        ),
     )
 
     subject_id = metadata.get("Subject").get("subject_id")
@@ -140,7 +143,7 @@ def session_to_nwb(
         metadata=metadata,
         nwbfile_path=nwbfile_path,
         conversion_options=conversion_options,
-        overwrite=overwrite
+        overwrite=overwrite,
     )
 
     return nwbfile_path

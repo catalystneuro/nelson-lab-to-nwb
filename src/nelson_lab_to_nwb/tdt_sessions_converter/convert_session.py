@@ -1,4 +1,5 @@
 """Primary script to run to convert sessions using the NWBConverter."""
+
 from pathlib import Path
 import numpy as np
 from neuroconv.utils import load_dict_from_file, dict_deep_update
@@ -25,7 +26,12 @@ def session_to_nwb(
     aim_score_file_path: FilePath,
     behavioral_video_file_path: FilePath,
     user_metadata_file_path: FilePath,
-    noldus_variables_columns_names: list = ["Elongation", "Velocity", "Distance moved", "Rotation"],
+    noldus_variables_columns_names: list = [
+        "Elongation",
+        "Velocity",
+        "Distance moved",
+        "Rotation",
+    ],
     noldus_epoc_name: str = "Cam2",
     aim_epoc_name: str = "TTL1",
     overwrite: bool = False,
@@ -95,7 +101,7 @@ def session_to_nwb(
 
     camera_ttl_timestamps = tdt_events.get(noldus_epoc_name).get("onset")
     noldus_df = converter.data_interface_objects.get("NoldusInterface").get_dataframe()
-    noldus_synced_timestamps = list(camera_ttl_timestamps[-noldus_df.shape[0]:])
+    noldus_synced_timestamps = list(camera_ttl_timestamps[-noldus_df.shape[0] :])
 
     # Because the TDT acquisition system misses the TTL times for the first video frames,
     # we need to manually add the first N timestamps to the camera synced timestamps list
@@ -130,7 +136,7 @@ def session_to_nwb(
         metadata=metadata,
         nwbfile_path=nwbfile_path,
         overwrite=overwrite,
-        conversion_options=conversion_options
+        conversion_options=conversion_options,
     )
 
     print(f"Conversion complete. NWB file saved to: {nwbfile_path}")

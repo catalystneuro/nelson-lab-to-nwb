@@ -1,6 +1,6 @@
 from nelson_lab_to_nwb.interfaces import (
     IntanMultifilesRecordingInterface,
-    AIMScoreInterface
+    AIMScoreInterface,
 )
 from neuroconv import NWBConverter
 from neuroconv.datainterfaces import VideoInterface
