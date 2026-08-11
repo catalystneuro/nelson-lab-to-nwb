@@ -64,6 +64,10 @@ def set_probe_type_2(extractor) -> None:
         shape_params={"width": 11, "height": 15},
         contact_ids=np.arange(0, 64),
     )
+    # set_contacts clears whatever generate_multi_shank wired, so the mapping is set here.
+    # This assumes the connector is wired straight through, as set_probe_type_1 does; it has
+    # not been confirmed against the headstage.
+    probe.set_device_channel_indices(channel_indices=np.arange(0, 64))
 
     extractor.set_probe(probe, in_place=True)
 

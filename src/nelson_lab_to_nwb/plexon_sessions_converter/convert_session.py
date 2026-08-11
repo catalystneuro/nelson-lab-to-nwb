@@ -1,7 +1,7 @@
 """Primary script to run to convert sessions using the NWBConverter."""
 
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 from neuroconv.utils import load_dict_from_file, dict_deep_update
 from pydantic import FilePath, DirectoryPath
 
@@ -22,6 +22,7 @@ def session_to_nwb(
         "Rotation",
     ],
     aim_start_event_name: str = "Keyboard1",
+    probe_type: Literal["type_1", "type_2"] = "type_1",
     include_units: bool = True,
     ogen_event_name: str = "Laser",
     ogen_amplitudes_array: list = [],
@@ -78,7 +79,7 @@ def session_to_nwb(
         NoldusInterface=dict(file_path=noldus_file_path),
         AIMScore=dict(file_path=aim_score_file_path),
     )
-    converter = PlexonNWBConverter(source_data=source_data, verbose=verbose)
+    converter = PlexonNWBConverter(source_data=source_data, probe_type=probe_type, verbose=verbose)
 
     # Load and update metadata
     converter_metadata = converter.get_metadata()

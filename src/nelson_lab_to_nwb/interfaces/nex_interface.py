@@ -7,7 +7,6 @@ from pynwb import NWBFile
 from pynwb.ogen import OptogeneticSeries
 import numpy as np
 
-from nelson_lab_to_nwb.utils.probe import set_probe
 
 
 def reconstruct_ttl_signal(rise_timestamps, step_duration, amplitudes, reconstruction_sampling_rate=1000):
@@ -70,9 +69,6 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             if name in channels_to_remove:
                 ids_to_remove.append(i)
         self.recording_extractor = self.recording_extractor.remove_channels(remove_channel_ids=ids_to_remove)
-
-        # Add probe information: https://probeinterface.readthedocs.io/en/main/index.html
-        set_probe(self.recording_extractor)
 
         self.neo_rec0 = recording_list[0].neo_reader
         self.recording_header = self.neo_rec0.header
