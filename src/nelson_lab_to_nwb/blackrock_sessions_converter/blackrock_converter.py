@@ -76,7 +76,7 @@ class BlackrockNWBConverter(NWBConverter):
                 ttl_times_filtered = ttl_times[ttl_times <= laser_times[0]] / digital_events_sampling_rate
 
                 video_interface = self.data_interface_objects["BehavioralVideo"]
-                print(f"Setting aligned timestamps for video {video_interface.video_name}.")
+                print(f"Setting aligned timestamps for video {video_interface.metadata_key}.")
                 video_interface.set_aligned_timestamps(aligned_timestamps=[ttl_times_filtered])
 
             # Align Ecephys interfaces

@@ -25,5 +25,5 @@ class IntanSessionNWBConverter(NWBConverter):
             video_interface = self.data_interface_objects.get(interface_name, None)
             if video_interface is None:
                 continue
-            print(f"Setting aligned timestamps for video {video_interface.video_name}.")
+            print(f"Setting aligned timestamps for video {video_interface.metadata_key}.")
             video_interface.set_aligned_timestamps(aligned_timestamps=[ttl_times])
