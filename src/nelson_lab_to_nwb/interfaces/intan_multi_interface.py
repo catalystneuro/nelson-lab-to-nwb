@@ -44,11 +44,12 @@ def get_ttl_signal(neo_reader, ttl_signal_name="DIGITAL-IN-14"):
 def make_concatenate_extractor(
     folder_path: DirectoryPath,
     stream_id: str = "0",
+    **extractor_kwargs,
 ):
     list_of_files = sorted([str(f.resolve()) for f in Path(folder_path).glob("*.rhd")])
     list_of_recordings = []
     for file in list_of_files:
-        rec = read_intan(file_path=file, stream_id=stream_id)
+        rec = read_intan(file_path=file, stream_id=stream_id, **extractor_kwargs)
         list_of_recordings.append(rec)
     return concatenate_recordings(list_of_recordings)
 
@@ -87,7 +88,7 @@ class IntanMultifilesRecordingInterface(BaseRecordingExtractorInterface):
     stream_id = "0"  # This is the only stream_id of Intan that might have neural data
 
     @classmethod
-    def get_extractor(cls):
+    def get_extractor_class(cls):
         cls.Extractor = make_concatenate_extractor
         return make_concatenate_extractor
 

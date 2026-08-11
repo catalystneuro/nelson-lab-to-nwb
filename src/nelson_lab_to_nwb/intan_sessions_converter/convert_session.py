@@ -60,12 +60,12 @@ def session_to_nwb(
         AIMScore=dict(file_path=aim_score_file_path, verbose=verbose),
         BehavioralVideoTop=dict(
             file_paths=[top_behavioral_video_file_path],
-            metadata_key_name="VideoTop",
+            video_name="VideoTop",
             verbose=verbose,
         ),
         BehavioralVideoSide=dict(
             file_paths=[side_behavioral_video_file_path],
-            metadata_key_name="VideoSide",
+            video_name="VideoSide",
             verbose=verbose,
         ),
     )
@@ -80,6 +80,7 @@ def session_to_nwb(
 
     # Conversion options
     conversion_options = dict(
+        IntanMultifilesRaw=dict(stub_test=stub_test),
         AIMScore=dict(
             timestamps_column_name="Time (minutes relative to injection)",
             aims_column_name="AIMS",

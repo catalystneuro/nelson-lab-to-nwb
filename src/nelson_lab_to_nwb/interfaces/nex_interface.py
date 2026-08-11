@@ -33,6 +33,14 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
     associated_suffixes = (".nex",)
     info = "Interface for NeuroExplorer recording data."
 
+    @classmethod
+    def get_extractor_class(cls):
+        from spikeinterface.extractors.neoextractors.neuroexplorer import (
+            NeuroExplorerRecordingExtractor,
+        )
+
+        return NeuroExplorerRecordingExtractor
+
     def __init__(
         self,
         file_path: FilePath,

@@ -5,7 +5,7 @@ from datetime import datetime
 from neuroconv.datainterfaces import (
     BlackrockRecordingInterface,
     BlackrockSortingInterface,
-    VideoInterface,
+    ExternalVideoInterface,
 )
 from neuroconv import NWBConverter
 from neuroconv.utils import dict_deep_update
@@ -25,7 +25,7 @@ class BlackrockNWBConverter(NWBConverter):
         BlackrockLFP=BlackrockRecordingInterface,
         BlackrockSorting=BlackrockSortingInterface,
         BehavioralEvents=CognitiveBehavioralInterface,
-        BehavioralVideo=VideoInterface,
+        BehavioralVideo=ExternalVideoInterface,
     )
 
     def __init__(
@@ -76,7 +76,7 @@ class BlackrockNWBConverter(NWBConverter):
                 ttl_times_filtered = ttl_times[ttl_times <= laser_times[0]] / digital_events_sampling_rate
 
                 video_interface = self.data_interface_objects["BehavioralVideo"]
-                print(f"Setting aligned timestamps for video {video_interface.metadata_key_name}.")
+                print(f"Setting aligned timestamps for video {video_interface.video_name}.")
                 video_interface.set_aligned_timestamps(aligned_timestamps=[ttl_times_filtered])
 
             # Align Ecephys interfaces
