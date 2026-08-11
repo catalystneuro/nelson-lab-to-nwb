@@ -14,11 +14,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    # "neuroconv==0.7.2",
-    "neuroconv @ git+https://github.com/catalystneuro/neuroconv.git@blackrock-nev",
-    "spikeinterface==0.102.3",
-    # "neo==0.14.1",
-    "neo @ git+https://github.com/NeuralEnsemble/python-neo.git@master",
+    "neuroconv>=0.9,<0.10",
+    "spikeinterface>=0.103,<0.105",
+    "neo>=0.14.3",
     "dandi>=0.67.3",
     "dandischema>=0.10.2",
     "nwbwidgets==0.11.3",
@@ -27,7 +25,7 @@ dependencies = [
     "ndx-fiber-photometry==0.1.0",
     "tdt==0.6.5",
     "PyYAML==6.0.1",
-    "openpyxl==3.1.2",
+    "openpyxl>=3.1.5",
     "pandas>=2.2.0",
     "opencv-python-headless",
 ]

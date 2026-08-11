@@ -46,7 +46,7 @@ To run the example notebooks, just navigate to the experiment's folder and run f
 
 ```bash
 conda activate env_nelson
-jupyter notebook
+jupyter lab
 ```
 
  This will open a new tab in your browser with the Jupyter interface. From there you can open the `example_conversion.ipynb` notebook and follow along.
