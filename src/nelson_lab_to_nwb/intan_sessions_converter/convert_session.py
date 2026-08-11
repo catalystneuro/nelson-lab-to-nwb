@@ -1,6 +1,7 @@
 """Primary script to run to convert sessions using the NWBConverter."""
 
 from pathlib import Path
+from typing import Literal
 from pydantic import FilePath, DirectoryPath
 
 from neuroconv.utils import load_dict_from_file, dict_deep_update
@@ -14,6 +15,7 @@ def session_to_nwb(
     top_behavioral_video_file_path: FilePath,
     side_behavioral_video_file_path: FilePath,
     user_metadata_file_path: FilePath,
+    probe_type: Literal["type_1", "type_2"] = "type_1",
     injection_time_in_seconds: float = 0.0,
     stub_test: bool = False,
     overwrite: bool = False,
@@ -35,6 +37,8 @@ def session_to_nwb(
         Path to the side recording behavioral video file (.mp4, .avi).
     user_metadata_file_path : FilePath
         Path to the user metadata file (.yaml).
+    probe_type : Literal["type_1", "type_2"], optional (default "type_1")
+        Probe geometry to attach: "type_1" is the 32-channel optrode array, "type_2" the 64-channel probe.
     injection_time_in_seconds : float, optional (default 0.0)
         Time of injection in seconds, used to synchronize AIM scores. Default 0.0.
     stub_test : bool, optional (default False)
@@ -53,7 +57,8 @@ def session_to_nwb(
     # Initialize converter
     source_data = dict(
         IntanMultifilesRaw=dict(
-            folder_path=intan_folder_path,
+            file_path=sorted(Path(intan_folder_path).glob("*.rhd"))[0],
+            saved_files_are_split=True,
             verbose=verbose,
             es_key="ElectricalSeries",
         ),
@@ -70,7 +75,7 @@ def session_to_nwb(
         ),
     )
 
-    converter = IntanSessionNWBConverter(source_data=source_data, verbose=verbose)
+    converter = IntanSessionNWBConverter(source_data=source_data, probe_type=probe_type, verbose=verbose)
 
     # Automatically fetch metadata from files, then update it with user-defined metadata
     source_metadata = converter.get_metadata()

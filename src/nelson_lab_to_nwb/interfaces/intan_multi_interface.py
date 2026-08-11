@@ -1,10 +1,7 @@
 from pathlib import Path
 import numpy as np
 from pydantic import DirectoryPath
-from neuroconv.datainterfaces import IntanRecordingInterface
 from neo.rawio import IntanRawIO
-
-from nelson_lab_to_nwb.utils.probe import set_probe
 
 
 def find_rising_times(signal, sampling_rate):
@@ -33,60 +30,21 @@ def get_ttl_signal(neo_reader, ttl_signal_name="DIGITAL-IN-14"):
     return ttl_signal.flatten(), ttl_signal_sampling_rate
 
 
-class IntanMultifilesRecordingInterface(IntanRecordingInterface):
+def extract_ttl_times(
+    folder_path: DirectoryPath,
+    ttl_signal_name: str = "DIGITAL-IN-14",
+):
     """
-    Interface for an Intan session saved across multiple .rhd files.
+    Rising-edge times of one Intan digital line, concatenated across a split session.
 
-    The concatenation is done by NeuroConv's own `saved_files_are_split` option; this class
-    only adds the lab's probe geometry and the TTL extraction used to align the videos.
+    NeuroConv's `IntanDigitalInterface` reads the same lines but only to write them as an
+    events table; it exposes no accessor for the times, so the alignment still reads them here.
     """
-
-    display_name = "Intan Recording"
-    associated_suffixes = (".rhd", ".rhs")
-    info = "Interface for Intan recording data."
-
-    def __init__(
-        self,
-        folder_path: DirectoryPath,
-        verbose: bool = True,
-        es_key: str = "ElectricalSeries",
-    ):
-        """
-        Load and prepare raw data and corresponding metadata from the Intan format (.rhd or .rhs files).
-
-        Parameters
-        ----------
-        folder_path : DirectoryPath
-            Path to the folder containing the rhd or rhs files.
-        verbose : bool, default: True
-            Verbose
-        es_key : str, default: "ElectricalSeries"
-        """
-        self.folder_path = Path(folder_path)
-        rhd_file_paths = sorted(self.folder_path.glob("*.rhd"))
-        if not rhd_file_paths:
-            raise FileNotFoundError(f"No .rhd files found in {self.folder_path}.")
-
-        super().__init__(
-            file_path=rhd_file_paths[0],
-            saved_files_are_split=True,
-            verbose=verbose,
-            es_key=es_key,
-        )
-
-        # Add probe information: https://probeinterface.readthedocs.io/en/main/index.html
-        set_probe(self.recording_extractor)
-
-    def extract_ttl_times(
-        self,
-        ttl_signal_name: str = "DIGITAL-IN-14",
-    ):
-        list_of_files = sorted([str(f.resolve()) for f in self.folder_path.glob("*.rhd")])
-        ttl_signal_full = np.array([])
-        for file in list_of_files:
-            neo_reader = IntanRawIO(filename=file)
-            neo_reader.parse_header()
-            ttl_signal, ttl_sampling_rate = get_ttl_signal(neo_reader=neo_reader, ttl_signal_name=ttl_signal_name)
-            ttl_signal_full = np.concatenate((ttl_signal_full, ttl_signal))
-        ttl_times_full = find_rising_times(signal=ttl_signal_full, sampling_rate=ttl_sampling_rate)
-        return ttl_times_full
+    list_of_files = sorted([str(f.resolve()) for f in Path(folder_path).glob("*.rhd")])
+    ttl_signal_full = np.array([])
+    for file in list_of_files:
+        neo_reader = IntanRawIO(filename=file)
+        neo_reader.parse_header()
+        ttl_signal, ttl_sampling_rate = get_ttl_signal(neo_reader=neo_reader, ttl_signal_name=ttl_signal_name)
+        ttl_signal_full = np.concatenate((ttl_signal_full, ttl_signal))
+    return find_rising_times(signal=ttl_signal_full, sampling_rate=ttl_sampling_rate)
