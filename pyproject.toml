@@ -8,7 +8,7 @@ maintainers = [
     { name = "CatalystNeuro", email = "ben.dichter@catalystneuro.com" },
 ]
 license = { file = "LICENSE" }
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -24,7 +24,7 @@ dependencies = [
     "ndx-events==0.2.1",
     "ndx-fiber-photometry==0.1.0",
     "tdt==0.6.5",
-    "PyYAML==6.0.1",
+    "PyYAML>=6.0.1",
     "openpyxl>=3.1.5",
     "pandas>=2.2.0",
     "opencv-python-headless",
