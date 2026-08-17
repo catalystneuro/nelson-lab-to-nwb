@@ -66,7 +66,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         # Remove extra channels: "Laser" and "AD50"
         ids_to_remove = list()
         for i in self.recording_extractor.channel_ids:
-            name = self.recording_extractor.get_channel_property(channel_id=i, key="channel_names")
+            name = self.recording_extractor.get_channel_property(channel_id=i, key="channel_name")
             if name in channels_to_remove:
                 ids_to_remove.append(i)
         self.recording_extractor = self.recording_extractor.remove_channels(remove_channel_ids=ids_to_remove)
@@ -80,6 +80,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         self.subset_channels = None
         self.verbose = verbose
         self.es_key = es_key
+        self.metadata_key = es_key
         self._number_of_segments = self.recording_extractor.get_num_segments()
 
     def add_to_nwbfile(
@@ -87,13 +88,10 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         nwbfile: NWBFile,
         metadata: Optional[dict] = dict(),
         stub_test: bool = False,
-        starting_time: Optional[float] = None,
         write_as: Literal["raw", "lfp", "processed"] = "raw",
         write_electrical_series: bool = True,
-        compression: Optional[str] = "gzip",
-        compression_opts: Optional[int] = None,
         iterator_type: str = "v2",
-        iterator_opts: Optional[dict] = None,
+        iterator_options: Optional[dict] = None,
         include_units: bool = True,
         units_suffix_ignore: list = ["_wf", "_template"],
         ogen_event_name: str = "Laser",
@@ -104,13 +102,10 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             nwbfile=nwbfile,
             metadata=metadata,
             stub_test=stub_test,
-            starting_time=starting_time,
             write_as=write_as,
             write_electrical_series=write_electrical_series,
-            compression=compression,
-            compression_opts=compression_opts,
             iterator_type=iterator_type,
-            iterator_opts=iterator_opts,
+            iterator_options=iterator_options,
         )
         # Units
         if include_units:
