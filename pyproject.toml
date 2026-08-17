@@ -14,7 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "neuroconv==0.10.0rc1",
+    "neuroconv==0.10.0",
     "spikeinterface>=0.103,<0.105",
     "neo>=0.14.3",
     "dandi>=0.67.3",
