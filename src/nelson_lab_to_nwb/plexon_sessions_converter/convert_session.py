@@ -82,7 +82,7 @@ def session_to_nwb(
     converter = PlexonNWBConverter(source_data=source_data, verbose=verbose)
 
     # Load and update metadata
-    converter_metadata = converter.get_metadata()
+    converter_metadata = converter.get_metadata(use_new_metadata_format=True)
     extra_metadata = load_dict_from_file(metadata_file_path)
     metadata = dict_deep_update(converter_metadata, extra_metadata)
 

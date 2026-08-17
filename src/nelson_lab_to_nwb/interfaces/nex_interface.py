@@ -44,7 +44,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
     def __init__(
         self,
         file_path: FilePath,
-        es_key: str = "ElectricalSeries",
+        metadata_key: str = "ElectricalSeries",
         channels_to_remove: list = ["Laser", "AD50"],
         verbose: bool = True,
     ):
@@ -79,8 +79,8 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
 
         self.subset_channels = None
         self.verbose = verbose
-        self.es_key = es_key
-        self.metadata_key = es_key
+        self.es_key = None
+        self.metadata_key = metadata_key
         self._number_of_segments = self.recording_extractor.get_num_segments()
 
     def add_to_nwbfile(
