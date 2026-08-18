@@ -115,7 +115,9 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             for ii, sc in enumerate(spike_channels):
                 if not any([suffix in sc[0] for suffix in units_suffix_ignore]):
                     units_data = dict(
-                        spike_times=self.neo_rec0.get_spike_timestamps(spike_channel_index=ii),
+                        spike_times=self.neo_rec0.rescale_spike_timestamp(
+                            self.neo_rec0.get_spike_timestamps(spike_channel_index=ii)
+                        ),
                         waveform_mean=None,
                     )
                     if sc[0] + "_template" in spike_channels_ind_dict:
