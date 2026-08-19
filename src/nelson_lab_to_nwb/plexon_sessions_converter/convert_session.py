@@ -82,7 +82,7 @@ def session_to_nwb(
     converter = PlexonNWBConverter(source_data=source_data, verbose=verbose)
 
     # Load and update metadata
-    converter_metadata = converter.get_metadata(use_new_metadata_format=True)
+    converter_metadata = converter.get_metadata()
     extra_metadata = load_dict_from_file(metadata_file_path)
     metadata = dict_deep_update(converter_metadata, extra_metadata)
 
@@ -116,7 +116,7 @@ def session_to_nwb(
     # Run conversion
     conversion_options = dict(
         NeuroExplorerRecordingInterface=dict(
-            write_as="lfp",
+            parent_container="processing/LFP",
             stub_test=stub_test,
             include_units=include_units,
             units_suffix_ignore=["_wf", "_template"],
