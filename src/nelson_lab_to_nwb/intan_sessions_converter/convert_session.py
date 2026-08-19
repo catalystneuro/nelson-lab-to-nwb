@@ -58,11 +58,15 @@ def session_to_nwb(
 
     # Initialize converter
     source_data = dict(
-        IntanMultifilesRaw=dict(
+        IntanRecording=dict(
             file_path=sorted(Path(intan_folder_path).glob("*.rhd"))[0],
             saved_files_are_split=True,
             verbose=verbose,
-            es_key="ElectricalSeries",
+        ),
+        IntanDigital=dict(
+            file_path=sorted(Path(intan_folder_path).glob("*.rhd"))[0],
+            saved_files_are_split=True,
+            verbose=verbose,
         ),
         AIMScore=dict(file_path=aim_score_file_path, verbose=verbose),
     )
@@ -91,7 +95,7 @@ def session_to_nwb(
 
     # Conversion options
     conversion_options = dict(
-        IntanMultifilesRaw=dict(stub_test=stub_test),
+        IntanRecording=dict(stub_test=stub_test),
         AIMScore=dict(
             timestamps_column_name="Time (minutes relative to injection)",
             aims_column_name="AIMS",

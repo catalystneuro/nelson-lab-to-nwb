@@ -1,4 +1,3 @@
-from .intan_multi_interface import extract_ttl_times
 from .nex_interface import NeuroExplorerRecordingInterface
 from .noldus_interface import NoldusInterface
 from .aim_score_interface import AIMScoreInterface
