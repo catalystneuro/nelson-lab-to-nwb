@@ -3,6 +3,20 @@ from probeinterface import Probe
 import numpy as np
 
 
+# The geometry of the 32-channel optrode array, kept here because it is the only description of
+# that probe anyone wrote down. It is not attached to the recording: the array has no channel map
+# on record, so which of these positions belongs to which recording channel is unknown, and an
+# unverified assignment writes a wrong coordinate for every electrode. Attach it once the lab
+# supplies the wiring.
+OPTRODE_ARRAY_POSITIONS = np.array(
+    [[450, 0], [600, 0]]
+    + [[150, 150], [300, 150], [450, 150], [600, 150], [750, 150], [900, 150]]
+    + [[0, 300], [150, 300], [300, 300], [450, 300], [600, 300], [750, 300], [900, 300], [1050, 300]]
+    + [[0, 450], [150, 450], [300, 450], [750, 450], [900, 450], [1050, 450]]
+    + [[0, 600], [150, 600], [300, 600], [750, 600], [900, 600], [1050, 600]]
+    + [[150, 750], [300, 750], [750, 750], [900, 750]]
+)
+
 # Intan channel at each contact of the 64-channel probe, read off `P64-8 Mapping.pdf`, page 104 of
 # the 2019 Diagnostic Biochips catalogue, headed "ASSY INT64" and "Recording sites mapped to Intan
 # system". Each list runs from the tip of the shank towards its base. The sheet draws shank 1 front
@@ -15,25 +29,6 @@ P64_8_SHANK_2_RIGHT = [60, 56, 52, 48, 51, 55, 57, 59, 61, 63, 46, 44, 42, 40, 3
 
 
 def set_probe_type_1(extractor) -> None:
-    positions = [[450, 0], [600, 0]]
-    positions.extend([[150, 150], [300, 150], [450, 150], [600, 150], [750, 150], [900, 150]])
-    positions.extend(
-        [
-            [0, 300],
-            [150, 300],
-            [300, 300],
-            [450, 300],
-            [600, 300],
-            [750, 300],
-            [900, 300],
-            [1050, 300],
-        ]
-    )
-    positions.extend([[0, 450], [150, 450], [300, 450], [750, 450], [900, 450], [1050, 450]])
-    positions.extend([[0, 600], [150, 600], [300, 600], [750, 600], [900, 600], [1050, 600]])
-    positions.extend([[150, 750], [300, 750], [750, 750], [900, 750]])
-    positions = np.array(positions)
-
     probe = Probe(
         ndim=2,
         si_units="um",
@@ -41,7 +36,7 @@ def set_probe_type_1(extractor) -> None:
         manufacturer="Innovative Neurophysiology",
     )
     probe.set_contacts(
-        positions=positions,
+        positions=np.full((32, 2), np.nan),
         shapes="circle",
         shape_params={"radius": 4},
         contact_ids=np.arange(0, 32),
