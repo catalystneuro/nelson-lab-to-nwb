@@ -33,10 +33,18 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
     associated_suffixes = (".nex",)
     info = "Interface for NeuroExplorer recording data."
 
+    @classmethod
+    def get_extractor_class(cls):
+        from spikeinterface.extractors.neoextractors.neuroexplorer import (
+            NeuroExplorerRecordingExtractor,
+        )
+
+        return NeuroExplorerRecordingExtractor
+
     def __init__(
         self,
         file_path: FilePath,
-        es_key: str = "ElectricalSeries",
+        metadata_key: str = "ElectricalSeries",
         channels_to_remove: list = ["Laser", "AD50"],
         verbose: bool = True,
     ):
@@ -58,7 +66,7 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         # Remove extra channels: "Laser" and "AD50"
         ids_to_remove = list()
         for i in self.recording_extractor.channel_ids:
-            name = self.recording_extractor.get_channel_property(channel_id=i, key="channel_names")
+            name = self.recording_extractor.get_channel_property(channel_id=i, key="channel_name")
             if name in channels_to_remove:
                 ids_to_remove.append(i)
         self.recording_extractor = self.recording_extractor.remove_channels(remove_channel_ids=ids_to_remove)
@@ -71,7 +79,8 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
 
         self.subset_channels = None
         self.verbose = verbose
-        self.es_key = es_key
+        self.es_key = None
+        self.metadata_key = metadata_key
         self._number_of_segments = self.recording_extractor.get_num_segments()
 
     def add_to_nwbfile(
@@ -79,13 +88,10 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
         nwbfile: NWBFile,
         metadata: Optional[dict] = dict(),
         stub_test: bool = False,
-        starting_time: Optional[float] = None,
-        write_as: Literal["raw", "lfp", "processed"] = "raw",
+        parent_container: Literal["acquisition", "processing/LFP", "processing/FilteredEphys"] = "acquisition",
         write_electrical_series: bool = True,
-        compression: Optional[str] = "gzip",
-        compression_opts: Optional[int] = None,
         iterator_type: str = "v2",
-        iterator_opts: Optional[dict] = None,
+        iterator_options: Optional[dict] = None,
         include_units: bool = True,
         units_suffix_ignore: list = ["_wf", "_template"],
         ogen_event_name: str = "Laser",
@@ -96,13 +102,10 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             nwbfile=nwbfile,
             metadata=metadata,
             stub_test=stub_test,
-            starting_time=starting_time,
-            write_as=write_as,
+            parent_container=parent_container,
             write_electrical_series=write_electrical_series,
-            compression=compression,
-            compression_opts=compression_opts,
             iterator_type=iterator_type,
-            iterator_opts=iterator_opts,
+            iterator_options=iterator_options,
         )
         # Units
         if include_units:
@@ -112,7 +115,9 @@ class NeuroExplorerRecordingInterface(BaseRecordingExtractorInterface):
             for ii, sc in enumerate(spike_channels):
                 if not any([suffix in sc[0] for suffix in units_suffix_ignore]):
                     units_data = dict(
-                        spike_times=self.neo_rec0.get_spike_timestamps(spike_channel_index=ii),
+                        spike_times=self.neo_rec0.rescale_spike_timestamp(
+                            self.neo_rec0.get_spike_timestamps(spike_channel_index=ii)
+                        ),
                         waveform_mean=None,
                     )
                     if sc[0] + "_template" in spike_channels_ind_dict:

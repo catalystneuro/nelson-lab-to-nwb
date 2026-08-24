@@ -10,9 +10,9 @@ def session_to_nwb(
     *,
     output_folder_path: DirectoryPath,
     nex_file_path: FilePath,
-    noldus_file_path: FilePath,
     aim_score_file_path: FilePath,
     metadata_file_path: FilePath,
+    noldus_file_path: Optional[FilePath] = None,
     channel_names_to_remove: list = ["Laser", "AD50"],
     noldus_start_event_name: str = "Noldus Start",
     noldus_variables_columns_names: list = [
@@ -37,12 +37,12 @@ def session_to_nwb(
         Path to the output folder.
     nex_file_path : FilePath
         Path to the NeuroExplorer (.nex) file.
-    noldus_file_path : FilePath
-        Path to the Noldus (.xlsx) file.
     aim_score_file_path : FilePath
         Path to the AIMScore (.xlsx) file.
     metadata_file_path : FilePath
         Path to the metadata (.json) file.
+    noldus_file_path : FilePath, optional
+        Path to the Noldus (.xlsx) file. Omit it if the session was not tracked with Noldus.
     channel_names_to_remove : list, optional (default ["Laser", "AD50"])
         Names of the channels to remove from the NeuroExplorer file, by default ["Laser", "AD50"].
     noldus_start_event_name : str, optional (default "Noldus Start")
@@ -75,9 +75,10 @@ def session_to_nwb(
     # Initialize converter
     source_data = dict(
         NeuroExplorerRecordingInterface=dict(file_path=nex_file_path, channels_to_remove=channel_names_to_remove),
-        NoldusInterface=dict(file_path=noldus_file_path),
         AIMScore=dict(file_path=aim_score_file_path),
     )
+    if noldus_file_path is not None:
+        source_data["NoldusInterface"] = dict(file_path=noldus_file_path)
     converter = PlexonNWBConverter(source_data=source_data, verbose=verbose)
 
     # Load and update metadata
@@ -115,7 +116,7 @@ def session_to_nwb(
     # Run conversion
     conversion_options = dict(
         NeuroExplorerRecordingInterface=dict(
-            write_as="lfp",
+            parent_container="processing/LFP",
             stub_test=stub_test,
             include_units=include_units,
             units_suffix_ignore=["_wf", "_template"],
@@ -123,17 +124,18 @@ def session_to_nwb(
             ogen_ttl_samplig_rate=40000.0,
             ogen_amplitudes_array=ogen_amplitudes_array,
         ),
-        NoldusInterface=dict(
-            variables_columns_names=noldus_variables_columns_names,
-            timestamps_column_name="Trial time",
-            timestamp_offset=noldus_time_offset,
-        ),
         AIMScore=dict(
             timestamps_column_name="Time (minutes relative to injection)",
             aims_column_name="AIMS",
             timestamp_offset=aim_time_offset,
         ),
     )
+    if noldus_file_path is not None:
+        conversion_options["NoldusInterface"] = dict(
+            variables_columns_names=noldus_variables_columns_names,
+            timestamps_column_name="Trial time",
+            timestamp_offset=noldus_time_offset,
+        )
 
     subject_id = metadata.get("Subject").get("subject_id")
     start_datetime = metadata.get("NWBFile").get("session_start_time").replace(":", "").replace("-", "")[:-4]

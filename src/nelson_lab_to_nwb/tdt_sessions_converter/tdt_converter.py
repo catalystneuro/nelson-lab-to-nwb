@@ -1,5 +1,5 @@
 from neuroconv import NWBConverter
-from neuroconv.datainterfaces import TDTFiberPhotometryInterface, VideoInterface
+from neuroconv.datainterfaces import TDTFiberPhotometryInterface, ExternalVideoInterface
 from nelson_lab_to_nwb.interfaces import NoldusInterface, AIMScoreInterface
 
 
@@ -10,5 +10,5 @@ class TDTSessionConverter(NWBConverter):
         FiberPhotometry=TDTFiberPhotometryInterface,
         AIMScore=AIMScoreInterface,
         NoldusInterface=NoldusInterface,
-        BehavioralVideo=VideoInterface,
+        BehavioralVideo=ExternalVideoInterface,
     )

@@ -1,6 +1,7 @@
 """Primary script to run to convert sessions using the NWBConverter."""
 
 from pathlib import Path
+from typing import Literal
 from pydantic import FilePath, DirectoryPath
 
 from neuroconv.utils import load_dict_from_file, dict_deep_update
@@ -11,9 +12,10 @@ def session_to_nwb(
     output_folder_path: DirectoryPath,
     intan_folder_path: FilePath,
     aim_score_file_path: FilePath,
-    top_behavioral_video_file_path: FilePath,
-    side_behavioral_video_file_path: FilePath,
     user_metadata_file_path: FilePath,
+    top_behavioral_video_file_path: FilePath | None = None,
+    side_behavioral_video_file_path: FilePath | None = None,
+    probe_type: Literal["type_1", "type_2"] = "type_1",
     injection_time_in_seconds: float = 0.0,
     stub_test: bool = False,
     overwrite: bool = False,
@@ -29,12 +31,16 @@ def session_to_nwb(
         Path to the Intan folder containing the .rhd data files.
     aim_score_file_path : FilePath
         Path to the AIM score file (.csv, .xlsx).
-    top_behavioral_video_file_path : FilePath
-        Path to the top recording behavioral video file (.mp4, .avi).
-    side_behavioral_video_file_path : FilePath
-        Path to the side recording behavioral video file (.mp4, .avi).
     user_metadata_file_path : FilePath
         Path to the user metadata file (.yaml).
+    top_behavioral_video_file_path : FilePath, optional
+        Path to the top recording behavioral video file (.mp4, .avi). Omit it if the session
+        was recorded without that camera.
+    side_behavioral_video_file_path : FilePath, optional
+        Path to the side recording behavioral video file (.mp4, .avi). Omit it if the session
+        was recorded without that camera.
+    probe_type : Literal["type_1", "type_2"], optional (default "type_1")
+        Probe geometry to attach: "type_1" is the 32-channel optrode array, "type_2" the 64-channel probe.
     injection_time_in_seconds : float, optional (default 0.0)
         Time of injection in seconds, used to synchronize AIM scores. Default 0.0.
     stub_test : bool, optional (default False)
@@ -52,25 +58,34 @@ def session_to_nwb(
 
     # Initialize converter
     source_data = dict(
-        IntanMultifilesRaw=dict(
-            folder_path=intan_folder_path,
+        IntanRecording=dict(
+            file_path=sorted(Path(intan_folder_path).glob("*.rhd"))[0],
+            saved_files_are_split=True,
             verbose=verbose,
-            es_key="ElectricalSeries",
+        ),
+        IntanDigital=dict(
+            file_path=sorted(Path(intan_folder_path).glob("*.rhd"))[0],
+            saved_files_are_split=True,
+            verbose=verbose,
         ),
         AIMScore=dict(file_path=aim_score_file_path, verbose=verbose),
-        BehavioralVideoTop=dict(
-            file_paths=[top_behavioral_video_file_path],
-            metadata_key_name="VideoTop",
-            verbose=verbose,
-        ),
-        BehavioralVideoSide=dict(
-            file_paths=[side_behavioral_video_file_path],
-            metadata_key_name="VideoSide",
-            verbose=verbose,
-        ),
     )
+    # Sessions are recorded with one or two cameras, so each video is added only when its
+    # file is given. NWBConverter instantiates the interfaces present in source_data.
+    if top_behavioral_video_file_path is not None:
+        source_data["BehavioralVideoTop"] = dict(
+            file_paths=[top_behavioral_video_file_path],
+            video_name="VideoTop",
+            verbose=verbose,
+        )
+    if side_behavioral_video_file_path is not None:
+        source_data["BehavioralVideoSide"] = dict(
+            file_paths=[side_behavioral_video_file_path],
+            video_name="VideoSide",
+            verbose=verbose,
+        )
 
-    converter = IntanSessionNWBConverter(source_data=source_data, verbose=verbose)
+    converter = IntanSessionNWBConverter(source_data=source_data, probe_type=probe_type, verbose=verbose)
 
     # Automatically fetch metadata from files, then update it with user-defined metadata
     source_metadata = converter.get_metadata()
@@ -80,6 +95,7 @@ def session_to_nwb(
 
     # Conversion options
     conversion_options = dict(
+        IntanRecording=dict(stub_test=stub_test),
         AIMScore=dict(
             timestamps_column_name="Time (minutes relative to injection)",
             aims_column_name="AIMS",
