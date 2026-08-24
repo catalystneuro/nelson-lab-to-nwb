@@ -16,7 +16,9 @@ classifiers = [
 dependencies = [
     "neuroconv==0.10.0",
     "spikeinterface>=0.103,<0.105",
-    "neo>=0.14.3",
+    # Reads NeuroExplorer files above 2 GB, merged in python-neo PR #1898 and not yet
+    # released. Move this back to a version specifier once neo ships it.
+    "neo @ git+https://github.com/NeuralEnsemble/python-neo.git@5f64a9e03896489311d0047a27f8bf74786a8453",
     "dandi>=0.67.3",
     "dandischema>=0.10.2",
     "nwbinspector>=0.6.3",
