@@ -1,6 +1,17 @@
 from typing import Literal
-from probeinterface import Probe, generate_multi_shank
+from probeinterface import Probe
 import numpy as np
+
+
+# Intan channel at each contact of the 64-channel probe, read off `P64-8 Mapping.pdf`, page 104 of
+# the 2019 Diagnostic Biochips catalogue, headed "ASSY INT64" and "Recording sites mapped to Intan
+# system". Each list runs from the tip of the shank towards its base. The sheet draws shank 1 front
+# view and shank 2 back view, so the two columns of shank 2 may be mirrored with respect to those
+# of shank 1, which would exchange their x coordinates by 22.5 um and change nothing else.
+P64_8_SHANK_1_LEFT = [17, 21, 25, 29, 30, 26, 13, 15, 14, 12, 10, 8, 6, 4, 2, 0]
+P64_8_SHANK_1_RIGHT = [19, 23, 27, 31, 28, 24, 22, 20, 18, 16, 1, 3, 5, 7, 9, 11]
+P64_8_SHANK_2_LEFT = [62, 58, 54, 50, 49, 53, 34, 32, 33, 35, 37, 39, 41, 43, 45, 47]
+P64_8_SHANK_2_RIGHT = [60, 56, 52, 48, 51, 55, 57, 59, 61, 63, 46, 44, 42, 40, 38, 36]
 
 
 def set_probe_type_1(extractor) -> None:
@@ -41,33 +52,37 @@ def set_probe_type_1(extractor) -> None:
 
 
 def set_probe_type_2(extractor) -> None:
-    probe = generate_multi_shank(
-        num_shank=2,
-        num_columns=2,
-        num_contact_per_column=16,
-        shank_pitch=[250., 0],
+    # Two shanks 250 um apart, each of two columns of 16 contacts at a 25 um vertical pitch, with
+    # the second column offset by 22.5 um across and 12.5 um up.
+    columns = [
+        (P64_8_SHANK_1_LEFT, 0.0, 0.0, 0),
+        (P64_8_SHANK_1_RIGHT, 22.5, 12.5, 0),
+        (P64_8_SHANK_2_LEFT, 250.0, 0.0, 1),
+        (P64_8_SHANK_2_RIGHT, 272.5, 12.5, 1),
+    ]
+    positions = []
+    device_channel_indices = []
+    shank_ids = []
+    for channels, x, y_offset, shank_id in columns:
+        for position_in_column, channel in enumerate(channels):
+            positions.append([x, position_in_column * 25 + y_offset])
+            device_channel_indices.append(channel)
+            shank_ids.append(shank_id)
+
+    probe = Probe(
+        ndim=2,
+        si_units="um",
+        name="P64-8",
+        manufacturer="Diagnostic Biochips",
     )
-
-    positions = np.zeros((64, 2))
-    for i in range(0, 16):
-        positions[i] = (0, i * 25)
-    for i in range(16, 32):
-        positions[i] = (22.5, (i-16) * 25 + 12.5)
-    for i in range(32, 48):
-        positions[i] = (250, (i-32) * 25)
-    for i in range(48, 64):
-        positions[i] = (275.5, (i-48) * 25 + 12.5)
-
     probe.set_contacts(
-        positions=positions,
+        positions=np.array(positions),
         shapes="rect",
         shape_params={"width": 11, "height": 15},
         contact_ids=np.arange(0, 64),
+        shank_ids=np.array(shank_ids),
     )
-    # set_contacts clears whatever generate_multi_shank wired, so the mapping is set here.
-    # This assumes the connector is wired straight through, as set_probe_type_1 does; it has
-    # not been confirmed against the headstage.
-    probe.set_device_channel_indices(channel_indices=np.arange(0, 64))
+    probe.set_device_channel_indices(channel_indices=np.array(device_channel_indices))
 
     extractor.set_probe(probe, in_place=True)
 
