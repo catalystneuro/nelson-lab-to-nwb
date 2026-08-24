@@ -14,7 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "neuroconv==0.10.0",
+    "neuroconv<=0.11",
     "spikeinterface>=0.103,<0.105",
     # Reads NeuroExplorer files above 2 GB, merged in python-neo PR #1898 and not yet
     # released. Move this back to a version specifier once neo ships it.
