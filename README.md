@@ -32,6 +32,22 @@ pip install -e .
 Note:
 both of the methods above install the repository in [editable mode](https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs).
 
+### Updating an install you already have
+
+The steps above are for a first install. To move an existing clone to a newer version of the code, pull it and rebuild the environment:
+
+```
+cd nelson-lab-to-nwb
+git switch main
+git pull
+conda env remove --name env_nelson
+conda env create --file make_env.yml
+```
+
+The `conda env remove` line is there because `conda env create` refuses to write over an environment that already exists, including a half built one left behind by an install that failed part way. On the pip path, `pip install -e .` after pulling is enough.
+
+Rebuilding is only needed when the pinned dependencies change. It is harmless otherwise, so when in doubt, rebuild.
+
 
 ## Conversion
 At each experiment's folder you will find:
