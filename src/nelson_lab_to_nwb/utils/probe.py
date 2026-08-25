@@ -79,7 +79,10 @@ def set_probe_type_2(extractor) -> None:
     )
     probe.set_device_channel_indices(channel_indices=np.array(device_channel_indices))
 
-    extractor.set_probe(probe, in_place=True)
+    # by_probe keeps both shanks in one electrode group, as they have always been in these files.
+    # The default lets spikeinterface split the group by shank, which contradicts the group_name
+    # the Intan file carries and would rename the groups in every session.
+    extractor.set_probe(probe, group_mode="by_probe", in_place=True)
 
 
 def set_probe(
